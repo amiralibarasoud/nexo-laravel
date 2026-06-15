@@ -1,13 +1,13 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/$USER/nexo-app
-    - export PATH=$PATH:/usr/local/bin:/opt/cpanel/composer/bin
-    - /bin/bash -c "cd $DEPLOYPATH && composer install --no-dev --optimize-autoloader --no-interaction 2>&1 || true"
-    - /bin/bash -c "cd $DEPLOYPATH && php artisan config:clear 2>&1 || true"
-    - /bin/bash -c "cd $DEPLOYPATH && php artisan migrate --force 2>&1 || true"
+    - export DEPLOYPATH=$HOME/repositories/nexo-laravel
+    - export COMPOSERBIN=/usr/local/bin/composer
+    - /bin/bash -c "cd $DEPLOYPATH && $COMPOSERBIN install --no-dev --optimize-autoloader --no-interaction 2>&1"
+    - /bin/bash -c "cd $DEPLOYPATH && php artisan config:clear"
+    - /bin/bash -c "cd $DEPLOYPATH && php artisan migrate --force"
     - /bin/bash -c "cd $DEPLOYPATH && php artisan db:seed --class=SettingsSeeder --force 2>&1 || true"
     - /bin/bash -c "cd $DEPLOYPATH && php artisan storage:link 2>&1 || true"
-    - /bin/bash -c "cd $DEPLOYPATH && php artisan config:cache 2>&1 || true"
-    - /bin/bash -c "cd $DEPLOYPATH && php artisan route:cache 2>&1 || true"
-    - /bin/bash -c "cd $DEPLOYPATH && php artisan view:clear 2>&1 || true"
+    - /bin/bash -c "cd $DEPLOYPATH && php artisan config:cache"
+    - /bin/bash -c "cd $DEPLOYPATH && php artisan route:cache"
+    - /bin/bash -c "cd $DEPLOYPATH && php artisan view:clear"
