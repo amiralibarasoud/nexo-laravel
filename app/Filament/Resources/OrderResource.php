@@ -76,7 +76,7 @@ class OrderResource extends Resource
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('تاریخ')
-                    ->dateTime()
+                    ->formatStateUsing(fn($state) => $state ? toJalaliTime($state) : '—')
                     ->sortable(),
             ])
             ->filters([

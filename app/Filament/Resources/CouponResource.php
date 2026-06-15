@@ -111,9 +111,8 @@ class CouponResource extends Resource
 
                 Tables\Columns\TextColumn::make('expires_at')
                     ->label('انقضا')
-                    ->dateTime('Y/m/d')
-                    ->placeholder('بدون انقضا')
-                    ->color(fn($record) => $record->expires_at?->isPast() ? 'danger' : 'success'),
+                    ->formatStateUsing(fn($state) => $state ? toJalali($state, 'Y/m/d') : 'بدون انقضا')
+                    ->color(fn($state, $record) => $record->expires_at?->isPast() ? 'danger' : 'success'),
             ])
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_active')->label('وضعیت'),
