@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
         // Create admin user
         $admin = User::create([
             'name' => 'مدیر سیستم',
-            'mobile' => '09120000000',
+            'mobile' => '09129512697',
             'email' => 'admin@nexocourse.ir',
             'is_admin' => true,
             'is_active' => true,
