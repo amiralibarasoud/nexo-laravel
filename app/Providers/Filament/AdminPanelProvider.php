@@ -36,9 +36,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->font('Vazirmatn', url: 'https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&display=swap')
             ->navigationGroups([
-                NavigationGroup::make('مدیریت دوره‌ها')->icon('heroicon-o-academic-cap')->collapsible(false),
-                NavigationGroup::make('مدیریت مالی')->icon('heroicon-o-currency-dollar'),
-                NavigationGroup::make('مدیریت کاربران')->icon('heroicon-o-users'),
+                NavigationGroup::make('مدیریت دوره‌ها')->collapsible(false),
+                NavigationGroup::make('مدیریت مالی'),
+                NavigationGroup::make('مدیریت کاربران'),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
