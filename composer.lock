@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c705175e163684ef646b1d8bf98aa74a",
+    "content-hash": "d08e6081fffbe34a0bc6d983f8e9594c",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -3367,6 +3367,76 @@
                 "source": "https://github.com/Masterminds/html5-php/tree/2.10.0"
             },
             "time": "2025-07-25T09:04:22+00:00"
+        },
+        {
+            "name": "mokhosh/filament-jalali",
+            "version": "v4.10.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mokhosh/filament-jalali.git",
+                "reference": "1990f6ff0a1acecc49ce4a8e68e45b267451e85c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mokhosh/filament-jalali/zipball/1990f6ff0a1acecc49ce4a8e68e45b267451e85c",
+                "reference": "1990f6ff0a1acecc49ce4a8e68e45b267451e85c",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^3.0",
+                "illuminate/contracts": "^10.0|^11.0|^12.0",
+                "morilog/jalali": "^v3.4.2",
+                "php": "^8.1",
+                "spatie/laravel-package-tools": "^1.14.0"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^7.9|^8.0",
+                "orchestra/testbench": "^8.0|^9.0",
+                "pestphp/pest": "^3.0",
+                "pestphp/pest-plugin-arch": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "FilamentJalali": "Mokhosh\\FilamentJalali\\Facades\\FilamentJalali"
+                    },
+                    "providers": [
+                        "Mokhosh\\FilamentJalali\\FilamentJalaliServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Mokhosh\\FilamentJalali\\": "src/",
+                    "Mokhosh\\FilamentJalali\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mo Khosh",
+                    "email": "mskhoshnazar@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Add Jalali datetime to your filament tables",
+            "homepage": "https://github.com/mokhosh/filament-jalali",
+            "keywords": [
+                "filament-jalali",
+                "laravel",
+                "mokhosh"
+            ],
+            "support": {
+                "issues": "https://github.com/mokhosh/filament-jalali/issues",
+                "source": "https://github.com/mokhosh/filament-jalali/tree/v4.10.0"
+            },
+            "time": "2025-05-08T17:47:54+00:00"
         },
         {
             "name": "monolog/monolog",
