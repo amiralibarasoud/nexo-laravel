@@ -99,7 +99,7 @@ class CourseResource extends Resource
                 Tables\Columns\TextColumn::make('title')->label('عنوان')->searchable()->sortable()->limit(35)->weight('bold'),
                 Tables\Columns\TextColumn::make('category.name')->label('دسته')->badge()->color('primary'),
                 Tables\Columns\TextColumn::make('price')->label('قیمت')->formatStateUsing(fn($state) => price($state))->sortable(),
-                Tables\Columns\TextColumn::make('students_count')->label('دانش‌آموز')->formatStateUsing(fn($s) => toFarsiNumber($s))->sortable(),
+                Tables\Columns\TextColumn::make('students_count')->label('دانش‌آموز')->formatStateUsing(fn($state) => toFarsiNumber($state))->sortable(),
                 Tables\Columns\IconColumn::make('has_text')->label('متن')->boolean(),
                 Tables\Columns\IconColumn::make('has_audio')->label('صوت')->boolean(),
                 Tables\Columns\SelectColumn::make('status')->label('وضعیت')
