@@ -168,7 +168,7 @@
           </div>
         </div>
         <div class="border-t border-gray-800 mt-8 pt-6 text-center text-sm text-gray-500">
-          تمامی حقوق برای نکسو کورس محفوظ است © {{ new Date().getFullYear() }}
+          تمامی حقوق برای نکسو کورس محفوظ است © {{ currentJalaliYear }}
         </div>
       </div>
     </footer>
@@ -176,8 +176,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Link } from '@inertiajs/vue3';
+import { jalali } from '@/Composables/useJalali';
+
+const currentJalaliYear = computed(() => {
+  const y = jalali(new Date().toISOString());
+  return y ? y.split('/')[0] : '۱۴۰۳';
+});
 
 const userMenuOpen = ref(false);
 const mobileMenuOpen = ref(false);

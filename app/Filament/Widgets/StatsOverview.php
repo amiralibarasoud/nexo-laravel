@@ -33,14 +33,16 @@ class StatsOverview extends BaseWidget
 
         // Revenue chart (last 7 days)
         $revenueChart = collect(range(6, 0))->map(fn($d) =>
-            (int) Order::where('status', 'paid')
+            (int) (Order::where('status', 'paid')
                 ->whereDate('created_at', now()->subDays($d))
-                ->sum('amount') / 1000
+                ->sum('amount') / 1000)
         )->toArray();
 
         $enrollChart = collect(range(6, 0))->map(fn($d) =>
             Enrollment::whereDate('enrolled_at', now()->subDays($d))->count()
         )->toArray();
+
+        $todayJalali = toJalali(now(), 'j F Y');
 
         return [
             Stat::make('کل درآمد', price($totalRevenue))
@@ -65,7 +67,7 @@ class StatsOverview extends BaseWidget
                 ->descriptionIcon('heroicon-m-book-open')
                 ->color('warning'),
 
-            Stat::make('سفارشات امروز', toFarsiNumber(Order::whereDate('created_at', today())->where('status', 'paid')->count()))
+            Stat::make('سفارشات امروز | ' . toJalali(now(), 'j F'), toFarsiNumber(Order::whereDate('created_at', today())->where('status', 'paid')->count()))
                 ->description('درآمد امروز: ' . price(Order::whereDate('created_at', today())->where('status', 'paid')->sum('amount')))
                 ->descriptionIcon('heroicon-m-shopping-cart')
                 ->color('success'),

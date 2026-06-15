@@ -22,28 +22,53 @@ if (!function_exists('price')) {
 }
 
 if (!function_exists('toJalali')) {
-    function toJalali(\Carbon\Carbon|string|null $date, string $format = 'Y/m/d'): string
+    function toJalali(mixed $date, string $format = 'Y/m/d'): string
     {
-        if (!$date) {
-            return '';
+        if (!$date) return '—';
+        try {
+            if (!($date instanceof \Carbon\Carbon)) {
+                $date = \Carbon\Carbon::parse($date);
+            }
+            return \Morilog\Jalali\Jalalian::fromCarbon($date)->format($format);
+        } catch (\Throwable $e) {
+            return '—';
         }
-        if (is_string($date)) {
-            $date = \Carbon\Carbon::parse($date);
-        }
-        return \Morilog\Jalali\Jalalian::fromCarbon($date)->format($format);
     }
 }
 
 if (!function_exists('toJalaliTime')) {
-    function toJalaliTime(\Carbon\Carbon|string|null $date): string
+    function toJalaliTime(mixed $date): string
     {
-        if (!$date) {
-            return '';
+        return toJalali($date, 'Y/m/d - H:i');
+    }
+}
+
+if (!function_exists('toJalaliLong')) {
+    function toJalaliLong(mixed $date): string
+    {
+        return toJalali($date, 'j F Y');
+    }
+}
+
+if (!function_exists('toJalaliAgo')) {
+    function toJalaliAgo(mixed $date): string
+    {
+        if (!$date) return '—';
+        try {
+            if (!($date instanceof \Carbon\Carbon)) {
+                $date = \Carbon\Carbon::parse($date);
+            }
+            $diff  = (int) $date->diffInMinutes(now());
+            if ($diff < 1)  return 'همین الان';
+            if ($diff < 60) return toFarsiNumber($diff) . ' دقیقه پیش';
+            $hours = (int) $date->diffInHours(now());
+            if ($hours < 24) return toFarsiNumber($hours) . ' ساعت پیش';
+            $days  = (int) $date->diffInDays(now());
+            if ($days < 30) return toFarsiNumber($days) . ' روز پیش';
+            return toJalali($date);
+        } catch (\Throwable $e) {
+            return '—';
         }
-        if (is_string($date)) {
-            $date = \Carbon\Carbon::parse($date);
-        }
-        return \Morilog\Jalali\Jalalian::fromCarbon($date)->format('Y/m/d H:i');
     }
 }
 

@@ -20,19 +20,20 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user() ? [
-                    'id' => $request->user()->id,
-                    'name' => $request->user()->name,
-                    'mobile' => $request->user()->mobile,
-                    'email' => $request->user()->email,
-                    'avatar' => $request->user()->avatar,
+                    'id'       => $request->user()->id,
+                    'name'     => $request->user()->name,
+                    'mobile'   => $request->user()->mobile,
+                    'email'    => $request->user()->email,
+                    'avatar'   => $request->user()->avatar,
                     'is_admin' => $request->user()->is_admin,
                 ] : null,
             ],
             'flash' => [
                 'success' => fn() => $request->session()->get('success'),
-                'error' => fn() => $request->session()->get('error'),
-                'info' => fn() => $request->session()->get('info'),
+                'error'   => fn() => $request->session()->get('error'),
+                'info'    => fn() => $request->session()->get('info'),
             ],
+            'jalali_now' => toJalali(now(), 'Y/m/d'),
         ];
     }
 }
