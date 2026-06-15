@@ -1,0 +1,178 @@
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --font-family-sans: 'Vazirmatn', sans-serif;
+  --font-family-vazir: 'Vazirmatn', sans-serif;
+
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+  --color-primary-950: #172554;
+
+  --color-nexo-50: #f0fdf4;
+  --color-nexo-100: #dcfce7;
+  --color-nexo-200: #bbf7d0;
+  --color-nexo-300: #86efac;
+  --color-nexo-400: #4ade80;
+  --color-nexo-500: #22c55e;
+  --color-nexo-600: #16a34a;
+  --color-nexo-700: #15803d;
+  --color-nexo-800: #166534;
+  --color-nexo-900: #14532d;
+  --color-nexo-950: #052e16;
+}
+
+@layer base {
+  * {
+    font-family: 'Vazirmatn', sans-serif;
+  }
+
+  html {
+    direction: rtl;
+  }
+
+  body {
+    background-color: #f9fafb;
+    color: #111827;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--color-primary-600);
+    color: white;
+    font-weight: 600;
+    border-radius: 0.75rem;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    text-decoration: none;
+  }
+  .btn-primary:hover {
+    background-color: var(--color-primary-700);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    background-color: white;
+    color: var(--color-primary-600);
+    font-weight: 600;
+    border-radius: 0.75rem;
+    border: 2px solid var(--color-primary-600);
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .btn-secondary:hover {
+    background-color: #eff6ff;
+  }
+
+  .btn-nexo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--color-nexo-600);
+    color: white;
+    font-weight: 600;
+    border-radius: 0.75rem;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    text-decoration: none;
+  }
+  .btn-nexo:hover {
+    background-color: var(--color-nexo-700);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  }
+
+  .card {
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    border: 1px solid #f3f4f6;
+    overflow: hidden;
+  }
+
+  .card-hover {
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    border: 1px solid #f3f4f6;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+  .card-hover:hover {
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    transform: translateY(-4px);
+  }
+
+  .input-field {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.75rem;
+    outline: none;
+    transition: all 0.2s;
+    background-color: white;
+    text-align: right;
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 0.875rem;
+  }
+  .input-field:focus {
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .section-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.5rem;
+  }
+
+  .section-subtitle {
+    color: #6b7280;
+    font-size: 1.125rem;
+  }
+
+  .prose h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    margin-top: 1.5rem;
+  }
+  .prose p {
+    margin-bottom: 1rem;
+    line-height: 2;
+  }
+  .prose ul {
+    list-style: disc;
+    padding-right: 1.5rem;
+    margin-bottom: 1rem;
+  }
+}
