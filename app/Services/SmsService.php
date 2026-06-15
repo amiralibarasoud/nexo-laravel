@@ -12,7 +12,7 @@ class SmsService
 
     public function __construct()
     {
-        $this->apiKey = config('services.smsir.api_key', '');
+        $this->apiKey = (string) (config('services.smsir.api_key') ?? '');
     }
 
     /**

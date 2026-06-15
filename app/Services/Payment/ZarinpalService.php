@@ -14,8 +14,8 @@ class ZarinpalService
 
     public function __construct()
     {
-        $this->merchantId = config('services.zarinpal.merchant_id', '');
-        $this->sandbox = config('services.zarinpal.sandbox', true);
+        $this->merchantId = (string) (config('services.zarinpal.merchant_id') ?? '');
+        $this->sandbox = (bool) (config('services.zarinpal.sandbox') ?? true);
         $this->apiBase = $this->sandbox
             ? 'https://sandbox.zarinpal.com/pg/v4/payment'
             : 'https://api.zarinpal.com/pg/v4/payment';
