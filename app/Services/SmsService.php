@@ -16,42 +16,75 @@ class SmsService
     }
 
     /**
-     * Send OTP via SMS.ir verify (fast send) endpoint using template 238380.
-     * No line number required — uses the template directly.
+     * ارسال OTP از طریق وب‌سرویس SMS.ir
+     * endpoint: POST /v1/send/verify
+     * headers: x-api-key, Content-Type: application/json, Accept: text/plain
      */
     public function sendOtp(string $mobile, string $code): bool
     {
+        // حالت توسعه: بدون API key لاگ می‌زند
         if (empty($this->apiKey)) {
             Log::info("[SMS-DEV] OTP for {$mobile}: {$code}");
             return true;
         }
 
+        $templateId = (int) (config('services.smsir.otp_template_id') ?? 238380);
+
+        $payload = [
+            'mobile'     => $mobile,
+            'templateId' => $templateId,
+            'parameters' => [
+                [
+                    'name'  => 'Code',
+                    'value' => $code,
+                ],
+            ],
+        ];
+
+        Log::info("[SMS] Sending OTP to {$mobile} with template {$templateId}");
+
         try {
-            $response = Http::timeout(10)
+            $response = Http::timeout(15)
                 ->withHeaders([
-                    'X-API-KEY' => $this->apiKey,
-                    'Accept'    => 'application/json',
+                    'x-api-key'    => $this->apiKey,
                     'Content-Type' => 'application/json',
+                    'Accept'       => 'text/plain',
                 ])
-                ->post("{$this->baseUrl}/send/verify", [
-                    'mobile'     => $mobile,
-                    'templateId' => (int) config('services.smsir.otp_template_id', 238380),
-                    'parameters' => [
-                        ['name' => 'Code', 'value' => $code],
-                    ],
-                ]);
+                ->post("{$this->baseUrl}/send/verify", $payload);
 
-            $body = $response->json();
+            $statusCode = $response->status();
+            $body       = $response->body();
 
-            if ($response->successful() && isset($body['status']) && $body['status'] === 1) {
-                Log::info("[SMS] OTP sent to {$mobile}");
-                return true;
+            Log::info("[SMS] Response status={$statusCode} body={$body}");
+
+            // SMS.ir در موفقیت status 200 و MessageId برمی‌گردونه
+            if ($response->successful()) {
+                $data = $response->json();
+                // بعضی نسخه‌ها status:1 برمی‌گردونن
+                if (is_array($data)) {
+                    if (isset($data['status']) && $data['status'] === 1) {
+                        Log::info("[SMS] OTP sent successfully to {$mobile}");
+                        return true;
+                    }
+                    // اگر MessageId وجود داشت یعنی موفق بوده
+                    if (isset($data['data']['messageId']) || isset($data['messageId'])) {
+                        Log::info("[SMS] OTP sent successfully to {$mobile}");
+                        return true;
+                    }
+                }
+                // اگر body عدد بود (MessageId مستقیم)
+                if (is_numeric(trim($body)) && (int) trim($body) > 0) {
+                    Log::info("[SMS] OTP sent successfully to {$mobile}");
+                    return true;
+                }
+                Log::warning("[SMS] Unexpected response: {$body}");
+                return false;
             }
 
-            Log::error("[SMS] SMS.ir error for {$mobile}: " . json_encode($body));
+            Log::error("[SMS] HTTP error {$statusCode} for {$mobile}: {$body}");
             return false;
         } catch (\Exception $e) {
-            Log::error("[SMS] SMS.ir exception: " . $e->getMessage());
+            Log::error("[SMS] Exception for {$mobile}: " . $e->getMessage());
             return false;
         }
     }

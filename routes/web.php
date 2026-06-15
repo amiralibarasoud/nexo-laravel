@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\OtpAuthController;
+use App\Http\Controllers\CouponController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Course\CourseController;
 use App\Http\Controllers\HomeController;
@@ -35,6 +36,7 @@ Route::middleware('auth')->group(function () {
     // Payment
     Route::get('/checkout/{course:slug}', [PaymentController::class, 'checkout'])->name('payment.checkout');
     Route::post('/payment/initiate', [PaymentController::class, 'initiatePayment'])->name('payment.initiate');
+    Route::post('/coupon/validate', [CouponController::class, 'validate'])->name('coupon.validate');
 
     // User Dashboard
     Route::prefix('dashboard')->name('dashboard.')->group(function () {
