@@ -37,17 +37,17 @@ return [
 
     'smsir' => [
         'api_key' => env('SMSIR_API_KEY'),
-        'line_number' => env('SMSIR_LINE_NUMBER'),
-        'otp_template_id' => env('SMSIR_OTP_TEMPLATE_ID', 100000),
+        'otp_template_id' => env('SMSIR_OTP_TEMPLATE_ID', 238380),
     ],
 
     'zarinpal' => [
+        'enabled' => env('ZARINPAL_ENABLED', false),
         'merchant_id' => env('ZARINPAL_MERCHANT_ID'),
         'sandbox' => env('ZARINPAL_SANDBOX', true),
     ],
 
     'zibal' => [
-        'merchant' => env('ZIBAL_MERCHANT', 'zibal'),
+        'merchant' => env('ZIBAL_MERCHANT', '6a1ec5ceccc7cc942bdbec8f'),
     ],
 
 ];

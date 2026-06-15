@@ -50,15 +50,24 @@ class PaymentController extends Controller
                 'has_text' => $course->has_text,
                 'has_audio' => $course->has_audio,
             ],
+            'gateways' => [
+                'zarinpal' => config('services.zarinpal.enabled', false),
+                'zibal' => true,
+            ],
         ]);
     }
 
     public function initiatePayment(Request $request): RedirectResponse
     {
+        $allowedGateways = ['zibal'];
+        if (config('services.zarinpal.enabled', false)) {
+            $allowedGateways[] = 'zarinpal';
+        }
+
         $request->validate([
             'course_id' => ['required', 'exists:courses,id'],
             'content_type' => ['required', 'in:text,audio,both'],
-            'gateway' => ['required', 'in:zarinpal,zibal'],
+            'gateway' => ['required', \Illuminate\Validation\Rule::in($allowedGateways)],
         ]);
 
         $course = Course::findOrFail($request->course_id);

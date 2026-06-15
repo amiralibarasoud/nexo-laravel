@@ -77,7 +77,7 @@
           <h2 class="text-xl font-bold text-gray-900 mb-5">درگاه پرداخت</h2>
 
           <div class="space-y-3 mb-6">
-            <label class="flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-all"
+            <label v-if="gateways.zarinpal" class="flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-all"
                    :class="form.gateway === 'zarinpal' ? 'border-primary-500 bg-primary-50' : 'border-gray-200 hover:border-gray-300'">
               <input type="radio" value="zarinpal" v-model="form.gateway" class="text-primary-600" />
               <div class="flex items-center gap-3">
@@ -91,7 +91,7 @@
               </div>
             </label>
 
-            <label class="flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-all"
+            <label v-if="gateways.zibal" class="flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-all"
                    :class="form.gateway === 'zibal' ? 'border-primary-500 bg-primary-50' : 'border-gray-200 hover:border-gray-300'">
               <input type="radio" value="zibal" v-model="form.gateway" class="text-primary-600" />
               <div class="flex items-center gap-3">
@@ -141,12 +141,16 @@ import MainLayout from '@/Layouts/MainLayout.vue';
 
 const props = defineProps({
   course: Object,
+  gateways: {
+    type: Object,
+    default: () => ({ zarinpal: false, zibal: true }),
+  },
 });
 
 const loading = ref(false);
 const form = reactive({
   content_type: props.course.has_text ? 'text' : (props.course.has_audio ? 'audio' : 'text'),
-  gateway: 'zarinpal',
+  gateway: props.gateways.zibal ? 'zibal' : (props.gateways.zarinpal ? 'zarinpal' : 'zibal'),
 });
 
 function formatPrice(amount) {
