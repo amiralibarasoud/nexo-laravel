@@ -13,7 +13,7 @@ class ZibalService
 
     public function __construct()
     {
-        $this->merchant = config('services.zibal.merchant', 'zibal');
+        $this->merchant = (string) (config('services.zibal.merchant') ?? 'zibal');
     }
 
     public function request(int $amount, string $callbackUrl, string $mobile = '', string $description = ''): array
