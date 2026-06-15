@@ -71,10 +71,10 @@ class OtpAuthController extends Controller
         Auth::login($user, remember: true);
 
         return response()->json([
-            'success' => true,
-            'message' => 'خوش آمدید!',
-            'redirect' => session()->pull('url.intended', route('dashboard')),
-        ]);
+                'success' => true,
+                'message' => 'خوش آمدید!',
+                'redirect' => session()->pull('url.intended', route('dashboard.index')),
+            ]);
     }
 
     public function logout(Request $request): RedirectResponse

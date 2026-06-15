@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Controllers\Auth\OtpAuthController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Course\CourseController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\Payment\PaymentController;
+use App\Http\Controllers\UserDashboardController;
 use Illuminate\Support\Facades\Route;
 
 // Home
@@ -33,9 +36,24 @@ Route::middleware('auth')->group(function () {
     Route::get('/checkout/{course:slug}', [PaymentController::class, 'checkout'])->name('payment.checkout');
     Route::post('/payment/initiate', [PaymentController::class, 'initiatePayment'])->name('payment.initiate');
 
-    // Dashboard
-    Route::get('/dashboard', fn() => \Inertia\Inertia::render('Dashboard'))->name('dashboard');
+    // User Dashboard
+    Route::prefix('dashboard')->name('dashboard.')->group(function () {
+        Route::get('/', [UserDashboardController::class, 'index'])->name('index');
+        Route::get('/my-courses', [UserDashboardController::class, 'myCourses'])->name('my-courses');
+        Route::get('/orders', [UserDashboardController::class, 'orders'])->name('orders');
+        Route::get('/profile', [UserDashboardController::class, 'profile'])->name('profile');
+        Route::post('/profile', [UserDashboardController::class, 'updateProfile'])->name('profile.update');
+    });
 });
+
+// Static pages
+Route::get('/about', [PageController::class, 'about'])->name('about');
+Route::get('/contact', [PageController::class, 'contact'])->name('contact');
+Route::post('/contact', [PageController::class, 'submitContact'])->name('contact.submit');
+Route::get('/terms', [PageController::class, 'terms'])->name('terms');
+
+// Sitemap
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 // Payment callback (no auth middleware - gateway redirect)
 Route::get('/payment/callback/{gateway}/{order}', [PaymentController::class, 'callback'])->name('payment.callback');

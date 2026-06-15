@@ -1,5 +1,16 @@
 <template>
   <MainLayout>
+    <Head :title="seoTitle">
+      <meta name="description" :content="seoDesc">
+      <meta property="og:title" :content="seoTitle">
+      <meta property="og:description" :content="seoDesc">
+      <meta property="og:type" content="product">
+      <meta v-if="seoImage" property="og:image" :content="seoImage">
+      <meta name="twitter:title" :content="seoTitle">
+      <meta name="twitter:description" :content="seoDesc">
+      <meta v-if="seoImage" name="twitter:image" :content="seoImage">
+    </Head>
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Main Content -->
@@ -192,13 +203,18 @@
 
 <script setup>
 import MainLayout from '@/Layouts/MainLayout.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, Head } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
-defineProps({
+const props = defineProps({
   course: Object,
   is_enrolled: Boolean,
   enrollment: Object,
 });
+
+const seoTitle = computed(() => props.course.title);
+const seoDesc = computed(() => props.course.short_description || `دوره ${props.course.title} - خرید و مشاهده دوره`);
+const seoImage = computed(() => props.course.cover_image ? `/storage/${props.course.cover_image}` : null);
 
 function toPersian(n) {
   return String(n ?? 0).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
