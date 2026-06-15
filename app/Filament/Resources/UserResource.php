@@ -72,7 +72,7 @@ class UserResource extends Resource
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('تاریخ عضویت')
-                    ->jalaliDateTime('Y/m/d H:i')
+                    ->formatStateUsing(fn($state) => $state ? toJalaliTime($state) : '—')
                     ->sortable(),
             ])
             ->filters([

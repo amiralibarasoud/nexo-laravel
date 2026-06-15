@@ -70,8 +70,8 @@ class CouponResource extends Resource
 
             Forms\Components\Grid::make(3)->schema([
                 Forms\Components\Toggle::make('is_active')->label('فعال')->default(true),
-                Forms\Components\DateTimePicker::make('starts_at')->label('تاریخ شروع')->nullable()->jalali(),
-                Forms\Components\DateTimePicker::make('expires_at')->label('تاریخ انقضا')->nullable()->jalali(),
+                jalaliDatePicker('starts_at', 'تاریخ شروع')->nullable(),
+                jalaliDatePicker('expires_at', 'تاریخ انقضا')->nullable(),
             ]),
         ]);
     }
@@ -111,8 +111,7 @@ class CouponResource extends Resource
 
                 Tables\Columns\TextColumn::make('expires_at')
                     ->label('انقضا')
-                    ->jalaliDate('Y/m/d')
-                    ->placeholder('بدون انقضا')
+                    ->formatStateUsing(fn($state) => $state ? toJalali($state, 'Y/m/d') : 'بدون انقضا')
                     ->color(fn($state, $record) => $record->expires_at?->isPast() ? 'danger' : 'success'),
             ])
             ->filters([

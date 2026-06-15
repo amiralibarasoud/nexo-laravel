@@ -65,8 +65,7 @@ class CourseResource extends Resource
                             ->label('قیمت اصلی (تومان)')->numeric()->required()->default(0)->suffix('تومان'),
                         Forms\Components\TextInput::make('discounted_price')
                             ->label('قیمت با تخفیف (تومان)')->numeric()->nullable()->suffix('تومان'),
-                        Forms\Components\DateTimePicker::make('discount_expires_at')
-                            ->label('انقضای تخفیف')->jalali(),
+                        jalaliDatePicker('discount_expires_at', 'انقضای تخفیف'),
                     ]),
                     Forms\Components\Grid::make(3)->schema([
                         Forms\Components\Toggle::make('has_text')->label('محتوای متنی')->default(true),
@@ -83,7 +82,7 @@ class CourseResource extends Resource
                         Forms\Components\Select::make('status')->label('وضعیت')
                             ->options(['draft'=>'پیش‌نویس','published'=>'منتشر شده','archived'=>'آرشیو'])
                             ->default('draft')->required(),
-                        Forms\Components\DateTimePicker::make('published_at')->label('تاریخ انتشار')->jalali(),
+                        jalaliDatePicker('published_at', 'تاریخ انتشار'),
                     ]),
                 ]),
 

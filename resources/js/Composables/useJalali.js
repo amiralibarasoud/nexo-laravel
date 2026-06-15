@@ -1,106 +1,66 @@
-/**
- * تبدیل تاریخ میلادی به شمسی (جلالی)
- * بدون نیاز به پکیج خارجی
- */
+import jalaali from 'jalaali-js';
 
 const PERSIAN_MONTHS = [
   'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
   'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند',
 ];
 
-function toFarsiNum(n) {
+function toPersian(n) {
   return String(n).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
 }
 
-function padZero(n) {
+function pad(n) {
   return String(n).padStart(2, '0');
 }
 
-/**
- * تبدیل تاریخ میلادی به جلالی
- * @param {Date|string|null} date
- * @returns {{ jy: number, jm: number, jd: number, jh: number, ji: number }}
- */
-function gregorianToJalali(gy, gm, gd) {
-  const g_d_no = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-  let jy, jm, jd, j_day_no, i, gy2;
-
-  gy2 = (gm > 2) ? (gy + 1) : gy;
-  const g_day_no =
-    365 * gy +
-    Math.floor((gy2 + 3) / 4) -
-    Math.floor((gy2 + 99) / 100) +
-    Math.floor((gy2 + 399) / 400) +
-    g_d_no[gm - 1] +
-    gd;
-
-  j_day_no = g_day_no - 79;
-
-  const j_np = Math.floor(j_day_no / 12053);
-  j_day_no = j_day_no % 12053;
-  jy = 979 + 33 * j_np + 4 * Math.floor(j_day_no / 1461);
-  j_day_no %= 1461;
-
-  if (j_day_no >= 366) {
-    jy += Math.floor((j_day_no - 1) / 365);
-    j_day_no = (j_day_no - 1) % 365;
-  }
-
-  for (i = 0; i < 11 && j_day_no >= (j_day_no = j_day_no - (i < 6 ? 31 : 30)); i++) {
-    // empty
-  }
-  jm = i + 1;
-  jd = j_day_no + 1;
-
-  return { jy, jm, jd };
+function parseDate(input) {
+  if (!input) return null;
+  if (input instanceof Date) return input;
+  const d = new Date(input);
+  return isNaN(d.getTime()) ? null : d;
 }
 
 /**
- * فرمت تاریخ شمسی
- * @param {string|Date|null} input
+ * تبدیل تاریخ میلادی به شمسی
  * @param {'date'|'datetime'|'long'} format
  */
 export function jalali(input, format = 'date') {
-  if (!input) return '—';
+  const d = parseDate(input);
+  if (!d) return '—';
 
   try {
-    const d = typeof input === 'string' ? new Date(input) : input;
-    if (isNaN(d.getTime())) return '—';
+    const { jy, jm, jd } = jalaali.toJalaali(d.getFullYear(), d.getMonth() + 1, d.getDate());
+    const dateStr = `${toPersian(jy)}/${toPersian(pad(jm))}/${toPersian(pad(jd))}`;
+    const timeStr = `${toPersian(pad(d.getHours()))}:${toPersian(pad(d.getMinutes()))}`;
 
-    const { jy, jm, jd } = gregorianToJalali(d.getFullYear(), d.getMonth() + 1, d.getDate());
-
-    const farsiDate = `${toFarsiNum(jy)}/${toFarsiNum(padZero(jm))}/${toFarsiNum(padZero(jd))}`;
-    const farsiTime = `${toFarsiNum(padZero(d.getHours()))}:${toFarsiNum(padZero(d.getMinutes()))}`;
-
-    if (format === 'datetime') return `${farsiDate} - ${farsiTime}`;
-    if (format === 'long') return `${toFarsiNum(jd)} ${PERSIAN_MONTHS[jm - 1]} ${toFarsiNum(jy)}`;
-    return farsiDate;
+    if (format === 'datetime') return `${dateStr} ${timeStr}`;
+    if (format === 'long')     return `${toPersian(jd)} ${PERSIAN_MONTHS[jm - 1]} ${toPersian(jy)}`;
+    return dateStr;
   } catch {
     return '—';
   }
 }
 
-/**
- * زمان نسبی شمسی (مثل: ۳ روز پیش)
- */
+export function jalaliYear() {
+  const d = new Date();
+  const { jy } = jalaali.toJalaali(d.getFullYear(), d.getMonth() + 1, d.getDate());
+  return toPersian(jy);
+}
+
 export function jalaliAgo(input) {
-  if (!input) return '—';
-  try {
-    const d = typeof input === 'string' ? new Date(input) : input;
-    const diff = Date.now() - d.getTime();
-    const minutes = Math.floor(diff / 60000);
-    const hours   = Math.floor(diff / 3600000);
-    const days    = Math.floor(diff / 86400000);
+  const d = parseDate(input);
+  if (!d) return '—';
 
-    if (minutes < 1)  return 'همین الان';
-    if (minutes < 60) return `${toFarsiNum(minutes)} دقیقه پیش`;
-    if (hours < 24)   return `${toFarsiNum(hours)} ساعت پیش`;
-    if (days < 30)    return `${toFarsiNum(days)} روز پیش`;
+  const diff    = Math.floor((Date.now() - d.getTime()) / 1000);
+  const minutes = Math.floor(diff / 60);
+  const hours   = Math.floor(diff / 3600);
+  const days    = Math.floor(diff / 86400);
 
-    return jalali(input);
-  } catch {
-    return '—';
-  }
+  if (diff < 60)   return 'همین الان';
+  if (hours < 1)   return `${toPersian(minutes)} دقیقه پیش`;
+  if (hours < 24)  return `${toPersian(hours)} ساعت پیش`;
+  if (days < 30)   return `${toPersian(days)} روز پیش`;
+  return jalali(input);
 }
 
-export default { jalali, jalaliAgo };
+export default { jalali, jalaliYear, jalaliAgo };

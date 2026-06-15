@@ -176,14 +176,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { Link } from '@inertiajs/vue3';
-import { jalali } from '@/Composables/useJalali';
+import { jalaliYear } from '@/Composables/useJalali';
 
-const currentJalaliYear = computed(() => {
-  const y = jalali(new Date().toISOString());
-  return y ? y.split('/')[0] : '۱۴۰۳';
-});
+const currentJalaliYear = jalaliYear();
 
 const userMenuOpen = ref(false);
 const mobileMenuOpen = ref(false);
