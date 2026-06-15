@@ -98,16 +98,16 @@ class LessonResource extends Resource
                 Tables\Columns\TextColumn::make('title')
                     ->label('عنوان جلسه')->searchable()->sortable()->limit(40)->weight('semibold'),
                 Tables\Columns\IconColumn::make('text_content')
-                    ->label('متن')->boolean()->getStateUsing(fn($record) => !empty($record->text_content)),
+                    ->label('متن')->boolean()->getStateUsing(fn(\App\Models\Lesson $record) => !empty($record->text_content)),
                 Tables\Columns\IconColumn::make('audio_path')
-                    ->label('صوت')->boolean()->getStateUsing(fn($record) => !empty($record->audio_path)),
+                    ->label('صوت')->boolean()->getStateUsing(fn(\App\Models\Lesson $record) => !empty($record->audio_path)),
                 Tables\Columns\TextColumn::make('audio_duration_seconds')
                     ->label('مدت')
                     ->formatStateUsing(function ($state) {
                         if (!$state) return '—';
-                        $m = intdiv($state, 60);
-                        $s = $state % 60;
-                        return sprintf('%d:%02d', $m, $s);
+                        $minutes = intdiv((int) $state, 60);
+                        $seconds = (int) $state % 60;
+                        return sprintf('%d:%02d', $minutes, $seconds);
                     }),
                 Tables\Columns\IconColumn::make('is_preview')->label('رایگان')->boolean(),
                 Tables\Columns\IconColumn::make('is_published')->label('منتشر')->boolean(),
