@@ -27,10 +27,17 @@ class OtpAuthController extends Controller
             'mobile' => ['required', 'string', 'regex:/^09[0-9]{9}$/'],
         ], [
             'mobile.required' => 'شماره موبایل الزامی است.',
-            'mobile.regex' => 'شماره موبایل معتبر نیست.',
+            'mobile.regex'    => 'شماره موبایل معتبر نیست.',
         ]);
 
         $result = $this->otpService->send($request->mobile);
+
+        // در sandbox: کد را در response برمی‌گردانیم
+        if ($result['success'] && $this->otpService->isSandbox()) {
+            $result['sandbox'] = true;
+            $result['code']    = $this->otpService->getSandboxCode();
+            $result['message'] = '⚙️ حالت تست | کد تأیید: ' . $result['code'];
+        }
 
         return response()->json($result, $result['success'] ? 200 : 422);
     }

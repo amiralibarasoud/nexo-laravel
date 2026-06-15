@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\OtpCode;
+use App\Models\Setting;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -13,6 +14,16 @@ class OtpService
 
     public function __construct(private SmsService $smsService) {}
 
+    public function isSandbox(): bool
+    {
+        return Setting::getBool('sms_sandbox', true);
+    }
+
+    public function getSandboxCode(): string
+    {
+        return Setting::get('sms_sandbox_code', '12345');
+    }
+
     public function send(string $mobile): array
     {
         $mobile = normalizeMobile($mobile);
@@ -20,19 +31,21 @@ class OtpService
         // بررسی rate limit
         $lastOtp = OtpCode::where('mobile', $mobile)
             ->where('created_at', '>=', Carbon::now()->subSeconds(self::OTP_RESEND_SECONDS))
-            ->latest()
-            ->first();
+            ->latest()->first();
 
         if ($lastOtp) {
-            $secondsLeft = (int) max(1, self::OTP_RESEND_SECONDS - Carbon::now()->diffInSeconds($lastOtp->created_at));
+            $left = (int) max(1, self::OTP_RESEND_SECONDS - Carbon::now()->diffInSeconds($lastOtp->created_at));
             return [
                 'success'     => false,
-                'message'     => toFarsiNumber($secondsLeft) . ' ثانیه دیگر دوباره امتحان کنید.',
-                'retry_after' => $secondsLeft,
+                'message'     => toFarsiNumber($left) . ' ثانیه دیگر دوباره امتحان کنید.',
+                'retry_after' => $left,
             ];
         }
 
-        $code = $this->generateCode();
+        // در حالت sandbox کد ثابت استفاده می‌شه
+        $code = $this->isSandbox()
+            ? $this->getSandboxCode()
+            : $this->generateCode();
 
         OtpCode::create([
             'mobile'     => $mobile,
@@ -40,23 +53,24 @@ class OtpService
             'expires_at' => Carbon::now()->addMinutes(self::OTP_EXPIRY_MINUTES),
         ]);
 
-        $sent = $this->smsService->sendOtp($mobile, $code);
-
-        if (!$sent) {
-            // اگر SMS ارسال نشد، OTP را پاک کن تا کاربر دوباره تلاش کند
-            OtpCode::where('mobile', $mobile)->where('code', $code)->delete();
-            Log::error("[OTP] Failed to send to {$mobile}");
+        if ($this->isSandbox()) {
+            Log::info("[OTP-SANDBOX] Mobile={$mobile} Code={$code}");
             return [
-                'success' => false,
-                'message' => 'خطا در ارسال پیامک. لطفاً چند لحظه دیگر دوباره تلاش کنید.',
+                'success' => true,
+                'message' => 'حالت تست فعال است. کد: ' . $code,
+                'sandbox' => true,
+                'code'    => $code,
             ];
         }
 
-        Log::info("[OTP] Sent to {$mobile}");
-        return [
-            'success' => true,
-            'message' => 'کد تأیید به شماره شما ارسال شد.',
-        ];
+        $sent = $this->smsService->sendOtp($mobile, $code);
+
+        if (!$sent) {
+            OtpCode::where('mobile', $mobile)->where('code', $code)->delete();
+            return ['success' => false, 'message' => 'خطا در ارسال پیامک. لطفاً دوباره تلاش کنید.'];
+        }
+
+        return ['success' => true, 'message' => 'کد تأیید ارسال شد.'];
     }
 
     public function verify(string $mobile, string $code): bool
@@ -68,16 +82,12 @@ class OtpService
             ->where('code', $code)
             ->where('is_used', false)
             ->where('expires_at', '>=', Carbon::now())
-            ->latest()
-            ->first();
+            ->latest()->first();
 
-        if (!$otp) {
-            return false;
-        }
+        if (!$otp) return false;
 
         $otp->update(['is_used' => true]);
         OtpCode::where('mobile', $mobile)->where('id', '!=', $otp->id)->delete();
-
         return true;
     }
 

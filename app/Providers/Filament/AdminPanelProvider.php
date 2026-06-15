@@ -11,7 +11,10 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\MaxWidth;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
+use Illuminate\Support\HtmlString;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -29,16 +32,32 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('نکسو کورس')
-            ->favicon(asset('favicon.svg'))
+            ->favicon(asset('favicon.ico'))
             ->colors([
                 'primary' => Color::Blue,
-                'gray' => Color::Slate,
+                'gray'    => Color::Slate,
             ])
             ->font('Vazirmatn', url: 'https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&display=swap')
+            ->sidebarCollapsibleOnDesktop()
+            ->maxContentWidth(MaxWidth::Full)
+            ->renderHook(
+                PanelsRenderHook::HEAD_END,
+                fn(): HtmlString => new HtmlString('
+                <style>
+                    html, body { direction: rtl !important; font-family: Vazirmatn, sans-serif !important; }
+                    .fi-sidebar { right: 0 !important; left: auto !important; border-right: none !important; border-left: 1px solid rgb(var(--gray-200)) !important; }
+                    .fi-main { margin-right: var(--sidebar-width) !important; margin-left: 0 !important; }
+                    .fi-sidebar-close-btn { left: 0.75rem !important; right: auto !important; }
+                    .fi-topbar { padding-right: 0 !important; }
+                    [x-cloak] { display: none !important; }
+                    .fi-sidebar.fi-sidebar-open { right: 0 !important; }
+                </style>')
+            )
             ->navigationGroups([
                 NavigationGroup::make('مدیریت دوره‌ها')->collapsible(false),
                 NavigationGroup::make('مدیریت مالی'),
                 NavigationGroup::make('مدیریت کاربران'),
+                NavigationGroup::make('تنظیمات'),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')

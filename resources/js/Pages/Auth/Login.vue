@@ -57,6 +57,13 @@
               <p class="text-gray-600">ارسال شد</p>
             </div>
 
+            <!-- Sandbox Notice -->
+            <div v-if="sandboxCode" class="bg-amber-50 border-2 border-amber-300 rounded-xl px-4 py-3 text-center">
+              <p class="text-amber-700 font-bold text-sm mb-1">⚙️ حالت تست فعال است</p>
+              <p class="text-amber-800 text-2xl font-black tracking-widest">{{ sandboxCode }}</p>
+              <p class="text-amber-600 text-xs mt-1">این کد برای همه شماره‌ها کار می‌کند</p>
+            </div>
+
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-2">کد تأیید</label>
               <input
@@ -130,9 +137,10 @@ const code = ref('');
 const loading = ref(false);
 const errors = ref({});
 const errorMessage = ref('');
-const countdown = ref(60);
+const countdown = ref(90);
 const canResend = ref(false);
 const codeInput = ref(null);
+const sandboxCode = ref('');
 
 let countdownTimer = null;
 
@@ -163,7 +171,8 @@ async function sendOtp() {
     const response = await axios.post(route('auth.send-otp'), { mobile: mobile.value });
     if (response.data.success) {
       step.value = 'otp';
-      startCountdown(60);
+      sandboxCode.value = response.data.sandbox ? response.data.code : '';
+      startCountdown(90);
       await nextTick();
       codeInput.value?.focus();
     } else {
