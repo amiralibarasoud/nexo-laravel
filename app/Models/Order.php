@@ -13,6 +13,9 @@ class Order extends Model
         'course_id',
         'order_number',
         'amount',
+        'original_amount',
+        'discount_amount',
+        'coupon_id',
         'content_type',
         'status',
     ];

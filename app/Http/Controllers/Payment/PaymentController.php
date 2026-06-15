@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Payment;
 
 use App\Http\Controllers\Controller;
+use App\Models\Coupon;
+use App\Models\CouponUsage;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Order;
@@ -65,9 +67,10 @@ class PaymentController extends Controller
         }
 
         $request->validate([
-            'course_id' => ['required', 'exists:courses,id'],
+            'course_id'    => ['required', 'exists:courses,id'],
             'content_type' => ['required', 'in:text,audio,both'],
-            'gateway' => ['required', \Illuminate\Validation\Rule::in($allowedGateways)],
+            'gateway'      => ['required', \Illuminate\Validation\Rule::in($allowedGateways)],
+            'coupon_code'  => ['nullable', 'string'],
         ]);
 
         $course = Course::findOrFail($request->course_id);
@@ -77,16 +80,30 @@ class PaymentController extends Controller
             return redirect()->route('courses.learn', $course->slug);
         }
 
-        $amount = $course->effective_price;
+        $originalAmount = $course->effective_price;
+        $amount         = $originalAmount;
+        $discountAmount = 0;
+        $coupon         = null;
 
-        return DB::transaction(function () use ($request, $course, $user, $amount) {
+        if ($request->filled('coupon_code')) {
+            $coupon = Coupon::where('code', strtoupper(trim($request->coupon_code)))->first();
+            if ($coupon && $coupon->isValid() && $coupon->isValidForUser($user->id) && $coupon->isValidForAmount($originalAmount)) {
+                $discountAmount = $coupon->calculateDiscount($originalAmount);
+                $amount         = $originalAmount - $discountAmount;
+            }
+        }
+
+        return DB::transaction(function () use ($request, $course, $user, $amount, $originalAmount, $discountAmount, $coupon) {
             $order = Order::create([
-                'user_id' => $user->id,
-                'course_id' => $course->id,
-                'order_number' => Order::generateOrderNumber(),
-                'amount' => $amount,
-                'content_type' => $request->content_type,
-                'status' => 'pending',
+                'user_id'         => $user->id,
+                'course_id'       => $course->id,
+                'order_number'    => Order::generateOrderNumber(),
+                'amount'          => $amount,
+                'original_amount' => $originalAmount,
+                'discount_amount' => $discountAmount,
+                'coupon_id'       => $coupon?->id,
+                'content_type'    => $request->content_type,
+                'status'          => 'pending',
             ]);
 
             $callbackUrl = route('payment.callback', ['gateway' => $request->gateway, 'order' => $order->id]);
@@ -175,6 +192,16 @@ class PaymentController extends Controller
                 ]);
 
                 Course::where('id', $order->course_id)->increment('students_count');
+
+                if ($order->coupon_id && $order->discount_amount > 0) {
+                    CouponUsage::create([
+                        'coupon_id'       => $order->coupon_id,
+                        'user_id'         => $order->user_id,
+                        'order_id'        => $order->id,
+                        'discount_amount' => $order->discount_amount,
+                    ]);
+                    Coupon::where('id', $order->coupon_id)->increment('usage_count');
+                }
             });
 
             return redirect()->route('courses.learn', $order->course->slug)

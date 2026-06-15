@@ -4,12 +4,12 @@ namespace App\Services;
 
 use App\Models\OtpCode;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class OtpService
 {
     private const OTP_EXPIRY_MINUTES = 5;
-    private const OTP_RESEND_SECONDS = 60;
-    private const MAX_ATTEMPTS = 5;
+    private const OTP_RESEND_SECONDS = 90;
 
     public function __construct(private SmsService $smsService) {}
 
@@ -17,16 +17,17 @@ class OtpService
     {
         $mobile = normalizeMobile($mobile);
 
+        // بررسی rate limit
         $lastOtp = OtpCode::where('mobile', $mobile)
             ->where('created_at', '>=', Carbon::now()->subSeconds(self::OTP_RESEND_SECONDS))
             ->latest()
             ->first();
 
         if ($lastOtp) {
-            $secondsLeft = self::OTP_RESEND_SECONDS - Carbon::now()->diffInSeconds($lastOtp->created_at);
+            $secondsLeft = (int) max(1, self::OTP_RESEND_SECONDS - Carbon::now()->diffInSeconds($lastOtp->created_at));
             return [
-                'success' => false,
-                'message' => "لطفاً {$secondsLeft} ثانیه دیگر دوباره تلاش کنید.",
+                'success'     => false,
+                'message'     => toFarsiNumber($secondsLeft) . ' ثانیه دیگر دوباره امتحان کنید.',
                 'retry_after' => $secondsLeft,
             ];
         }
@@ -34,23 +35,34 @@ class OtpService
         $code = $this->generateCode();
 
         OtpCode::create([
-            'mobile' => $mobile,
-            'code' => $code,
+            'mobile'     => $mobile,
+            'code'       => $code,
             'expires_at' => Carbon::now()->addMinutes(self::OTP_EXPIRY_MINUTES),
         ]);
 
         $sent = $this->smsService->sendOtp($mobile, $code);
 
+        if (!$sent) {
+            // اگر SMS ارسال نشد، OTP را پاک کن تا کاربر دوباره تلاش کند
+            OtpCode::where('mobile', $mobile)->where('code', $code)->delete();
+            Log::error("[OTP] Failed to send to {$mobile}");
+            return [
+                'success' => false,
+                'message' => 'خطا در ارسال پیامک. لطفاً چند لحظه دیگر دوباره تلاش کنید.',
+            ];
+        }
+
+        Log::info("[OTP] Sent to {$mobile}");
         return [
-            'success' => $sent,
-            'message' => $sent ? 'کد تأیید ارسال شد.' : 'خطا در ارسال پیامک. لطفاً دوباره تلاش کنید.',
+            'success' => true,
+            'message' => 'کد تأیید به شماره شما ارسال شد.',
         ];
     }
 
     public function verify(string $mobile, string $code): bool
     {
         $mobile = normalizeMobile($mobile);
-        $code = persianToEnglishNumber($code);
+        $code   = persianToEnglishNumber(trim($code));
 
         $otp = OtpCode::where('mobile', $mobile)
             ->where('code', $code)
@@ -64,7 +76,6 @@ class OtpService
         }
 
         $otp->update(['is_used' => true]);
-
         OtpCode::where('mobile', $mobile)->where('id', '!=', $otp->id)->delete();
 
         return true;
