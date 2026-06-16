@@ -16,6 +16,7 @@
           <div class="hidden md:flex items-center gap-6">
             <Link :href="route('home')" class="text-gray-600 hover:text-primary-600 font-medium transition-colors text-sm">خانه</Link>
             <Link :href="route('courses.index')" class="text-gray-600 hover:text-primary-600 font-medium transition-colors text-sm">دوره‌ها</Link>
+            <Link :href="route('blog.index')" class="text-gray-600 hover:text-primary-600 font-medium transition-colors text-sm">بلاگ</Link>
             <Link :href="route('about')" class="text-gray-600 hover:text-primary-600 font-medium transition-colors text-sm">درباره ما</Link>
             <Link :href="route('contact')" class="text-gray-600 hover:text-primary-600 font-medium transition-colors text-sm">تماس</Link>
           </div>

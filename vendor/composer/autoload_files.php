@@ -51,5 +51,4 @@ return array(
     '801c31d8ed748cfa537fa45402288c95' => $vendorDir . '/psy/psysh/src/functions.php',
     '98caa11a197f6516a8e48aa4abb5ccc6' => $vendorDir . '/inertiajs/inertia-laravel/helpers.php',
     '46f975d33ff7d1038a3cd2f4f5838dbd' => $baseDir . '/app/Helpers/PersianHelper.php',
-    '948895ff6af557c94a1e3c88ec3e3185' => $baseDir . '/app/Helpers/FilamentJalaliHelper.php',
 );

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BlogPost;
 use App\Models\Course;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
@@ -17,6 +18,17 @@ class SitemapController extends Controller
             ->add(Url::create('/about')->setPriority(0.5))
             ->add(Url::create('/contact')->setPriority(0.5))
             ->add(Url::create('/terms')->setPriority(0.3));
+
+        $sitemap->add(Url::create('/blog')->setPriority(0.8)->setChangeFrequency('daily'));
+
+        BlogPost::published()->get()->each(function (BlogPost $post) use ($sitemap) {
+            $sitemap->add(
+                Url::create("/blog/{$post->slug}")
+                    ->setLastModificationDate($post->updated_at)
+                    ->setPriority(0.7)
+                    ->setChangeFrequency('weekly')
+            );
+        });
 
         Course::published()->get()->each(function (Course $course) use ($sitemap) {
             $sitemap->add(
