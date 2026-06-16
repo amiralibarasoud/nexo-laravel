@@ -117,8 +117,48 @@ try {
     // پاک‌سازی کش کانفیگ/روت/ویو (در صورت کش‌شدن مقادیر قدیمی)
     $run('optimize:clear');
 
+    $run('migrate:status');
+
     // اجرای مهاجرت‌ها — این همان چیزی است که جدول‌ها را روی هاست می‌سازد
     $run('migrate', ['--force' => true]);
+
+    // اگر migration ثبت شده ولی جدول ساخته نشده (هاست‌هایی که migrate ناقص اجرا شده)
+    $requiredTables = [
+        'users' => null,
+        'categories' => '2024_01_01_000010_create_categories_table.php',
+        'courses' => '2024_01_01_000020_create_courses_table.php',
+        'orders' => '2024_01_01_000030_create_orders_table.php',
+        'settings' => '2024_01_01_000060_create_settings_table.php',
+        'blog_categories' => '2024_01_01_000070_create_blog_tables.php',
+        'blog_posts' => '2024_01_01_000070_create_blog_tables.php',
+    ];
+
+    echo "\n=== Table check ===\n";
+    foreach ($requiredTables as $table => $migrationFile) {
+        $exists = \Illuminate\Support\Facades\Schema::hasTable($table);
+        echo $table . ': ' . ($exists ? 'OK ✓' : 'MISSING ✗') . "\n";
+        $setupLog("table {$table}: " . ($exists ? 'OK' : 'MISSING'), $exists ? 'OK' : 'FAIL');
+
+        if (!$exists && $migrationFile !== null) {
+            $migrationName = str_replace('.php', '', $migrationFile);
+            $recorded = \Illuminate\Support\Facades\DB::table('migrations')
+                ->where('migration', $migrationName)
+                ->exists();
+
+            if ($recorded) {
+                echo "  → migration recorded but table missing; re-running {$migrationFile}\n";
+                $setupLog("re-run migration {$migrationName} (orphaned record)", 'WARN');
+                \Illuminate\Support\Facades\DB::table('migrations')
+                    ->where('migration', $migrationName)
+                    ->delete();
+            }
+
+            $run('migrate', [
+                '--force' => true,
+                '--path' => 'database/migrations/' . $migrationFile,
+            ]);
+        }
+    }
 
     // سیدرها (idempotent هستند و با firstOrCreate رکورد تکراری نمی‌سازند)
     $run('db:seed', ['--class' => 'SettingsSeeder', '--force' => true]);
