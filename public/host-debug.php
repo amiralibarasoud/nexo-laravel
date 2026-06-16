@@ -160,9 +160,36 @@ if (extension_loaded('pdo_mysql') && isset($env['DB_HOST'], $env['DB_DATABASE'],
     $log('DB test skipped (missing pdo_mysql or .env DB vars)', 'WARN');
 }
 
+// ─── Vendor integrity (autoload vs files on disk) ──────────────
+$autoloadFiles = $baseDir . '/vendor/composer/autoload_files.php';
+$vendorOk = true;
+if (file_exists($autoloadFiles)) {
+    $files = require $autoloadFiles;
+    $missing = [];
+    foreach ($files as $path) {
+        if (!file_exists($path)) {
+            $missing[] = str_replace($baseDir . '/', '', $path);
+        }
+    }
+    if ($missing !== []) {
+        $vendorOk = false;
+        $log('vendor INCOMPLETE — ' . count($missing) . ' autoload file(s) missing', 'FAIL');
+        foreach (array_slice($missing, 0, 5) as $m) {
+            $log("  missing: {$m}", 'FAIL');
+        }
+        if (count($missing) > 5) {
+            $log('  ... and ' . (count($missing) - 5) . ' more', 'FAIL');
+        }
+        $log('علت: vendor با composer install --no-dev ساخته نشده یا deploy ناقص است', 'HINT');
+        $log('روی لوکال: composer install --no-dev && commit vendor/composer/*', 'HINT');
+    } else {
+        $log('vendor autoload files OK (' . count($files) . ' files)', 'OK');
+    }
+}
+
 // ─── Try Laravel bootstrap (optional deeper test) ──────────────
 $autoload = $baseDir . '/vendor/autoload.php';
-if (file_exists($autoload)) {
+if (file_exists($autoload) && $vendorOk) {
     try {
         require $autoload;
         $app = require $baseDir . '/bootstrap/app.php';
