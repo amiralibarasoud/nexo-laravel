@@ -72,6 +72,7 @@ class AdminPanelProvider extends PanelProvider
             )
             ->navigationGroups([
                 NavigationGroup::make('مدیریت دوره‌ها')->collapsible(false),
+                NavigationGroup::make('بلاگ'),
                 NavigationGroup::make('مدیریت مالی'),
                 NavigationGroup::make('مدیریت کاربران'),
                 NavigationGroup::make('تنظیمات'),

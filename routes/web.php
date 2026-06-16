@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\OtpAuthController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Course\CourseController;
@@ -47,6 +48,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/profile', [UserDashboardController::class, 'updateProfile'])->name('profile.update');
     });
 });
+
+// Blog
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/category/{slug}', [BlogController::class, 'byCategory'])->name('blog.category');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 // Static pages
 Route::get('/about', [PageController::class, 'about'])->name('about');

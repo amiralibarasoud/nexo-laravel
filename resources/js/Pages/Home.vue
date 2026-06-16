@@ -119,6 +119,55 @@
       </div>
     </section>
 
+    <!-- Latest Blog Posts -->
+    <section v-if="latest_posts && latest_posts.length" class="py-20 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between mb-10">
+          <div>
+            <h2 class="section-title">آخرین مقالات</h2>
+            <p class="section-subtitle">بخوان، یاد بگیر، رشد کن</p>
+          </div>
+          <Link :href="route('blog.index')" class="text-primary-600 hover:text-primary-700 font-semibold flex items-center gap-1 text-sm">
+            همه مقالات
+            <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </Link>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Link v-for="post in latest_posts" :key="post.id"
+                :href="route('blog.show', post.slug)"
+                class="card-hover group block">
+            <div class="aspect-video bg-gray-100 overflow-hidden">
+              <img v-if="post.cover_image" :src="`/storage/${post.cover_image}`"
+                   :alt="post.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+              <div v-else class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                </svg>
+              </div>
+            </div>
+            <div class="p-5">
+              <div v-if="post.category" class="mb-2">
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full text-white"
+                      :style="`background: ${post.category.color}`">
+                  {{ post.category.name }}
+                </span>
+              </div>
+              <h3 class="font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors leading-relaxed">
+                {{ post.title }}
+              </h3>
+              <p v-if="post.excerpt" class="text-gray-500 text-sm line-clamp-2 leading-relaxed mb-3">
+                {{ post.excerpt }}
+              </p>
+              <p class="text-gray-400 text-xs">{{ post.published_at }}</p>
+            </div>
+          </Link>
+        </div>
+      </div>
+    </section>
+
     <!-- Content Types Section -->
     <section class="py-20 bg-gradient-to-br from-gray-900 to-primary-900 text-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -164,6 +213,7 @@ defineProps({
   featured_courses: Array,
   categories: Array,
   stats: Object,
+  latest_posts: Array,
 });
 
 function toPersian(n) {

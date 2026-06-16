@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\Course;
 use Inertia\Inertia;
@@ -44,14 +45,30 @@ class HomeController extends Controller
             ->get(['id', 'name', 'slug', 'icon', 'color', 'description']);
 
         $stats = [
-            'courses_count' => Course::published()->count(),
+            'courses_count'  => Course::published()->count(),
             'students_count' => \App\Models\Enrollment::count(),
         ];
 
+        $latestPosts = BlogPost::published()
+            ->with('category')
+            ->latest('published_at')
+            ->limit(3)
+            ->get()
+            ->map(fn($p) => [
+                'id'           => $p->id,
+                'title'        => $p->title,
+                'slug'         => $p->slug,
+                'excerpt'      => $p->excerpt,
+                'cover_image'  => $p->cover_image,
+                'published_at' => toJalali($p->published_at),
+                'category'     => $p->category ? ['name' => $p->category->name, 'color' => $p->category->color] : null,
+            ]);
+
         return Inertia::render('Home', [
             'featured_courses' => $featuredCourses,
-            'categories' => $categories,
-            'stats' => $stats,
+            'categories'       => $categories,
+            'stats'            => $stats,
+            'latest_posts'     => $latestPosts,
         ]);
     }
 }
