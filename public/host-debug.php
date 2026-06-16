@@ -160,6 +160,14 @@ if (extension_loaded('pdo_mysql') && isset($env['DB_HOST'], $env['DB_DATABASE'],
     $log('DB test skipped (missing pdo_mysql or .env DB vars)', 'WARN');
 }
 
+// ─── Vite build (صفحات عمومی؛ admin/Filament جداست) ───────────
+$manifestPath = __DIR__ . '/build/manifest.json';
+if (!file_exists($manifestPath)) {
+    $log('public/build/manifest.json MISSING — صفحه اصلی 500 می‌دهد ولی /admin ممکن است OK باشد', 'FAIL');
+} else {
+    $log('public/build/manifest.json OK', 'OK');
+}
+
 // ─── Vendor integrity (autoload vs files on disk) ──────────────
 $autoloadFiles = $baseDir . '/vendor/composer/autoload_files.php';
 $vendorOk = true;
