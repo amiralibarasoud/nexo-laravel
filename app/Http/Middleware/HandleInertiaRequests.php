@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -34,6 +35,9 @@ class HandleInertiaRequests extends Middleware
                 'info'    => fn() => $request->session()->get('info'),
             ],
             'jalali_now' => toJalali(now(), 'Y/m/d'),
+            'theme'      => fn () => [
+                'header' => Setting::headerConfig(),
+            ],
         ];
     }
 }
