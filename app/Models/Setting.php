@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class Setting extends Model
 {
@@ -112,7 +113,7 @@ class Setting extends Model
         $logo = static::get('header_logo');
 
         return [
-            'logo'                  => $logo ? asset('storage/' . ltrim($logo, '/')) : null,
+            'logo'                  => $logo ? Storage::disk('public')->url($logo) : null,
             'logo_letter'           => static::get('header_logo_letter', 'N'),
             'show_text_logo'        => static::getBool('header_show_text_logo', true),
             'site_name'             => static::get('header_site_name', 'نکسو'),

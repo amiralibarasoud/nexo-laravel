@@ -18,6 +18,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Support\Arr;
 
 class ThemeSettings extends Page implements HasForms
 {
@@ -33,10 +34,15 @@ class ThemeSettings extends Page implements HasForms
 
     public function mount(): void
     {
+        $this->fillFormFromSettings();
+    }
+
+    protected function fillFormFromSettings(): void
+    {
         $logo = Setting::get('header_logo');
 
         $this->form->fill([
-            'header_logo'                  => $logo ? [$logo] : null,
+            'header_logo'                  => $logo ?: null,
             'header_logo_letter'           => Setting::get('header_logo_letter', 'N'),
             'header_show_text_logo'        => Setting::getBool('header_show_text_logo', true),
             'header_site_name'             => Setting::get('header_site_name', 'نکسو'),
@@ -93,6 +99,7 @@ class ThemeSettings extends Page implements HasForms
                         ->image()
                         ->disk('public')
                         ->directory('theme/logo')
+                        ->visibility('public')
                         ->imageResizeMode('contain')
                         ->maxSize(2048)
                         ->helperText('در صورت آپلود، تصویر جایگزین لوگوی متنی می‌شود.')
@@ -155,6 +162,7 @@ class ThemeSettings extends Page implements HasForms
                             TextInput::make('url')
                                 ->label('لینک سفارشی')
                                 ->url()
+                                ->nullable()
                                 ->placeholder('https://...')
                                 ->visible(fn ($get) => empty($get('route_name')))
                                 ->helperText('فقط وقتی «لینک سفارشی» انتخاب شده باشد.'),
@@ -188,6 +196,7 @@ class ThemeSettings extends Page implements HasForms
                     TextInput::make('header_announcement_link')
                         ->label('لینک اعلان (اختیاری)')
                         ->url()
+                        ->nullable()
                         ->visible(fn ($get) => $get('header_announcement_enabled')),
                 ]),
 
@@ -216,6 +225,7 @@ class ThemeSettings extends Page implements HasForms
                             TextInput::make('link')
                                 ->label('لینک')
                                 ->url()
+                                ->nullable()
                                 ->visible(fn ($get) => in_array($get('type'), ['link', 'badge'], true)),
 
                             Select::make('position')
@@ -270,13 +280,10 @@ class ThemeSettings extends Page implements HasForms
     {
         $data = $this->form->getState();
 
-        $logo = $data['header_logo'] ?? null;
-        if (is_array($logo)) {
-            $logo = $logo[0] ?? '';
-        }
+        $logo = $this->extractUploadPath($data['header_logo'] ?? null) ?? '';
 
         Setting::setMany([
-            'header_logo'                  => $logo ?: '',
+            'header_logo'                  => $logo,
             'header_logo_letter'           => $data['header_logo_letter'] ?? 'N',
             'header_show_text_logo'        => ($data['header_show_text_logo'] ?? true) ? '1' : '0',
             'header_site_name'             => $data['header_site_name'] ?? 'نکسو',
@@ -291,10 +298,31 @@ class ThemeSettings extends Page implements HasForms
             'header_widgets'               => json_encode($data['header_widgets'] ?? [], JSON_UNESCAPED_UNICODE),
         ], 'theme');
 
+        $this->fillFormFromSettings();
+
         Notification::make()
             ->title('تنظیمات هدر ذخیره شد ✅')
             ->success()
             ->send();
+    }
+
+    protected function extractUploadPath(mixed $value): ?string
+    {
+        if (blank($value)) {
+            return null;
+        }
+
+        if (is_string($value)) {
+            return $value;
+        }
+
+        if (is_array($value)) {
+            $path = Arr::first(Arr::flatten($value));
+
+            return is_string($path) ? $path : null;
+        }
+
+        return null;
     }
 
     protected function getFormActions(): array
