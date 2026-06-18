@@ -111,6 +111,77 @@ class Setting extends Model
         ];
     }
 
+    public static function defaultContactInfoItems(): array
+    {
+        return [
+            ['icon' => '📧', 'title' => 'ایمیل', 'value' => 'info@nexocourse.ir', 'bg' => 'bg-blue-50', 'visible' => true],
+            ['icon' => '📱', 'title' => 'پشتیبانی', 'value' => 'از طریق فرم تماس', 'bg' => 'bg-green-50', 'visible' => true],
+            ['icon' => '⏰', 'title' => 'ساعت پاسخگویی', 'value' => 'شنبه تا پنجشنبه ۹ تا ۱۸', 'bg' => 'bg-purple-50', 'visible' => true],
+        ];
+    }
+
+    public static function defaultAboutStats(): array
+    {
+        return [
+            ['value' => '۱۰+', 'label' => 'دوره آموزشی'],
+            ['value' => '۵۰۰+', 'label' => 'دانش‌آموز'],
+            ['value' => '۲', 'label' => 'فرمت محتوا'],
+            ['value' => '۱۰۰٪', 'label' => 'فارسی'],
+        ];
+    }
+
+    public static function defaultAboutValues(): array
+    {
+        return [
+            ['icon' => '🎯', 'title' => 'کاربردی', 'desc' => 'محتوای ما بر اساس نیاز واقعی بازار کار طراحی شده.'],
+            ['icon' => '🌍', 'title' => 'فارسی‌زبان', 'desc' => 'تمام محتوا به زبان فارسی و متناسب با فرهنگ ایران.'],
+            ['icon' => '💡', 'title' => 'نوآورانه', 'desc' => 'اولین پلتفرم با محتوای همزمان متنی و صوتی.'],
+            ['icon' => '🤝', 'title' => 'حمایت‌گر', 'desc' => 'پشتیبانی کامل در طول مسیر یادگیری شما.'],
+        ];
+    }
+
+    public static function pageThemeSeedDefaults(): array
+    {
+        return [
+            ['key' => 'contact_seo_title', 'value' => 'تماس با ما', 'group' => 'theme'],
+            ['key' => 'contact_page_title', 'value' => 'تماس با ما', 'group' => 'theme'],
+            ['key' => 'contact_page_subtitle', 'value' => 'هر سوالی داری، خوشحال می‌شیم پاسخ بدیم.', 'group' => 'theme'],
+            ['key' => 'contact_info_items', 'value' => json_encode(static::defaultContactInfoItems(), JSON_UNESCAPED_UNICODE), 'group' => 'theme'],
+            ['key' => 'contact_form_enabled', 'value' => '1', 'group' => 'theme'],
+            ['key' => 'contact_form_title', 'value' => 'ارسال پیام', 'group' => 'theme'],
+            ['key' => 'contact_form_name_label', 'value' => 'نام و نام خانوادگی *', 'group' => 'theme'],
+            ['key' => 'contact_form_mobile_label', 'value' => 'شماره موبایل *', 'group' => 'theme'],
+            ['key' => 'contact_form_subject_label', 'value' => 'موضوع *', 'group' => 'theme'],
+            ['key' => 'contact_form_message_label', 'value' => 'پیام *', 'group' => 'theme'],
+            ['key' => 'contact_form_name_placeholder', 'value' => 'نام شما', 'group' => 'theme'],
+            ['key' => 'contact_form_mobile_placeholder', 'value' => '09xxxxxxxxx', 'group' => 'theme'],
+            ['key' => 'contact_form_subject_placeholder', 'value' => 'موضوع پیام', 'group' => 'theme'],
+            ['key' => 'contact_form_message_placeholder', 'value' => 'پیام خود را بنویسید...', 'group' => 'theme'],
+            ['key' => 'contact_form_submit_text', 'value' => 'ارسال پیام', 'group' => 'theme'],
+            ['key' => 'contact_form_loading_text', 'value' => 'در حال ارسال...', 'group' => 'theme'],
+            ['key' => 'contact_form_success_message', 'value' => 'پیام شما دریافت شد. به زودی با شما تماس می‌گیریم.', 'group' => 'theme'],
+            ['key' => 'about_seo_title', 'value' => 'درباره ما', 'group' => 'theme'],
+            ['key' => 'about_hero_enabled', 'value' => '1', 'group' => 'theme'],
+            ['key' => 'about_hero_title', 'value' => 'درباره نکسو کورس', 'group' => 'theme'],
+            ['key' => 'about_hero_description', 'value' => 'ما یک پلتفرم آموزشی ایرانی هستیم که هدفمان ارائه آموزش‌های کاربردی به زبان فارسی است.', 'group' => 'theme'],
+            ['key' => 'about_hero_image', 'value' => '', 'group' => 'theme'],
+            ['key' => 'about_mission_enabled', 'value' => '1', 'group' => 'theme'],
+            ['key' => 'about_mission_title', 'value' => 'مأموریت ما', 'group' => 'theme'],
+            ['key' => 'about_mission_paragraph1', 'value' => 'نکسو کورس با هدف دسترسی آسان‌تر به آموزش‌های باکیفیت فارسی تأسیس شد. ما بر این باوریم که هر فردی باید بتواند با هر بودجه و در هر شرایطی، به بهترین آموزش‌ها دسترسی داشته باشد.', 'group' => 'theme'],
+            ['key' => 'about_mission_paragraph2', 'value' => 'نوآوری اصلی ما در ارائه محتوا به دو فرمت متنی و صوتی است — شما انتخاب می‌کنید که چطور یاد بگیرید.', 'group' => 'theme'],
+            ['key' => 'about_mission_image', 'value' => '', 'group' => 'theme'],
+            ['key' => 'about_mission_stats', 'value' => json_encode(static::defaultAboutStats(), JSON_UNESCAPED_UNICODE), 'group' => 'theme'],
+            ['key' => 'about_values_enabled', 'value' => '1', 'group' => 'theme'],
+            ['key' => 'about_values_title', 'value' => 'ارزش‌های ما', 'group' => 'theme'],
+            ['key' => 'about_values', 'value' => json_encode(static::defaultAboutValues(), JSON_UNESCAPED_UNICODE), 'group' => 'theme'],
+            ['key' => 'about_cta_enabled', 'value' => '1', 'group' => 'theme'],
+            ['key' => 'about_cta_title', 'value' => 'آماده شروع هستی؟', 'group' => 'theme'],
+            ['key' => 'about_cta_subtitle', 'value' => 'همین الان اولین دوره‌ات رو شروع کن.', 'group' => 'theme'],
+            ['key' => 'about_cta_button_text', 'value' => 'مشاهده دوره‌ها', 'group' => 'theme'],
+            ['key' => 'about_cta_button_route', 'value' => 'courses.index', 'group' => 'theme'],
+        ];
+    }
+
     public static function themeSeedDefaults(): array
     {
         return [
@@ -170,6 +241,7 @@ class Setting extends Model
             ['key' => 'footer_show_contact_link', 'value' => '1', 'group' => 'theme'],
             ['key' => 'footer_contact_link_text', 'value' => 'فرم تماس', 'group' => 'theme'],
             ['key' => 'footer_copyright', 'value' => 'تمامی حقوق برای نکسو کورس محفوظ است © {year}', 'group' => 'theme'],
+            ...static::pageThemeSeedDefaults(),
         ];
     }
 
@@ -298,6 +370,64 @@ class Setting extends Model
             'show_contact_link'  => static::getBool('footer_show_contact_link', true),
             'contact_link_text'  => static::get('footer_contact_link_text', 'فرم تماس'),
             'copyright'          => static::get('footer_copyright', 'تمامی حقوق برای نکسو کورس محفوظ است © {year}'),
+        ];
+    }
+
+    public static function contactConfig(): array
+    {
+        return [
+            'seo_title'    => static::get('contact_seo_title', 'تماس با ما'),
+            'page_title'   => static::get('contact_page_title', 'تماس با ما'),
+            'subtitle'     => static::get('contact_page_subtitle', ''),
+            'info_items'   => static::getJson('contact_info_items', static::defaultContactInfoItems()),
+            'form'         => [
+                'enabled'              => static::getBool('contact_form_enabled', true),
+                'title'                => static::get('contact_form_title', 'ارسال پیام'),
+                'name_label'           => static::get('contact_form_name_label', 'نام و نام خانوادگی *'),
+                'mobile_label'         => static::get('contact_form_mobile_label', 'شماره موبایل *'),
+                'subject_label'        => static::get('contact_form_subject_label', 'موضوع *'),
+                'message_label'        => static::get('contact_form_message_label', 'پیام *'),
+                'name_placeholder'     => static::get('contact_form_name_placeholder', 'نام شما'),
+                'mobile_placeholder'   => static::get('contact_form_mobile_placeholder', '09xxxxxxxxx'),
+                'subject_placeholder'  => static::get('contact_form_subject_placeholder', 'موضوع پیام'),
+                'message_placeholder'  => static::get('contact_form_message_placeholder', 'پیام خود را بنویسید...'),
+                'submit_text'          => static::get('contact_form_submit_text', 'ارسال پیام'),
+                'loading_text'         => static::get('contact_form_loading_text', 'در حال ارسال...'),
+                'success_message'      => static::get('contact_form_success_message', 'پیام شما دریافت شد. به زودی با شما تماس می‌گیریم.'),
+            ],
+        ];
+    }
+
+    public static function aboutConfig(): array
+    {
+        return [
+            'seo_title' => static::get('about_seo_title', 'درباره ما'),
+            'hero'      => [
+                'enabled'     => static::getBool('about_hero_enabled', true),
+                'title'       => static::get('about_hero_title', 'درباره نکسو کورس'),
+                'description' => static::get('about_hero_description', ''),
+                'image'       => static::storageUrl(static::get('about_hero_image')),
+            ],
+            'mission'   => [
+                'enabled'    => static::getBool('about_mission_enabled', true),
+                'title'      => static::get('about_mission_title', 'مأموریت ما'),
+                'paragraph1' => static::get('about_mission_paragraph1', ''),
+                'paragraph2' => static::get('about_mission_paragraph2', ''),
+                'image'      => static::storageUrl(static::get('about_mission_image')),
+                'stats'      => static::getJson('about_mission_stats', static::defaultAboutStats()),
+            ],
+            'values'    => [
+                'enabled' => static::getBool('about_values_enabled', true),
+                'title'   => static::get('about_values_title', 'ارزش‌های ما'),
+                'items'   => static::getJson('about_values', static::defaultAboutValues()),
+            ],
+            'cta'       => [
+                'enabled'     => static::getBool('about_cta_enabled', true),
+                'title'       => static::get('about_cta_title', 'آماده شروع هستی؟'),
+                'subtitle'    => static::get('about_cta_subtitle', ''),
+                'button_text' => static::get('about_cta_button_text', 'مشاهده دوره‌ها'),
+                'button_route'=> static::get('about_cta_button_route', 'courses.index'),
+            ],
         ];
     }
 }

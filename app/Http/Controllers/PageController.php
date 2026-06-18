@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -38,7 +39,7 @@ class PageController extends Controller
 
         Log::info('Contact form submitted', $request->only(['name', 'mobile', 'subject']));
 
-        return back()->with('success', 'پیام شما دریافت شد. به زودی با شما تماس می‌گیریم.');
+        return back()->with('success', Setting::get('contact_form_success_message', 'پیام شما دریافت شد. به زودی با شما تماس می‌گیریم.'));
     }
 
     public function terms(): Response

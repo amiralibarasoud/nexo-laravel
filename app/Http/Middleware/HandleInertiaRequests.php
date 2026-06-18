@@ -39,6 +39,8 @@ class HandleInertiaRequests extends Middleware
                 'header'   => Setting::headerConfig(),
                 'homepage' => Setting::homepageConfig(),
                 'footer'   => Setting::footerConfig(),
+                'contact'  => Setting::contactConfig(),
+                'about'    => Setting::aboutConfig(),
             ],
         ];
     }

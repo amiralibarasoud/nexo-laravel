@@ -96,6 +96,42 @@ class ThemeSettings extends Page implements HasForms
             'footer_show_contact_link'     => Setting::getBool('footer_show_contact_link', true),
             'footer_contact_link_text'     => Setting::get('footer_contact_link_text', 'فرم تماس'),
             'footer_copyright'             => Setting::get('footer_copyright', 'تمامی حقوق برای نکسو کورس محفوظ است © {year}'),
+            'contact_seo_title'            => Setting::get('contact_seo_title', 'تماس با ما'),
+            'contact_page_title'           => Setting::get('contact_page_title', 'تماس با ما'),
+            'contact_page_subtitle'        => Setting::get('contact_page_subtitle', ''),
+            'contact_info_items'           => Setting::getJson('contact_info_items', Setting::defaultContactInfoItems()),
+            'contact_form_enabled'         => Setting::getBool('contact_form_enabled', true),
+            'contact_form_title'           => Setting::get('contact_form_title', 'ارسال پیام'),
+            'contact_form_name_label'      => Setting::get('contact_form_name_label', 'نام و نام خانوادگی *'),
+            'contact_form_mobile_label'    => Setting::get('contact_form_mobile_label', 'شماره موبایل *'),
+            'contact_form_subject_label'   => Setting::get('contact_form_subject_label', 'موضوع *'),
+            'contact_form_message_label'   => Setting::get('contact_form_message_label', 'پیام *'),
+            'contact_form_name_placeholder'=> Setting::get('contact_form_name_placeholder', 'نام شما'),
+            'contact_form_mobile_placeholder'=> Setting::get('contact_form_mobile_placeholder', '09xxxxxxxxx'),
+            'contact_form_subject_placeholder'=> Setting::get('contact_form_subject_placeholder', 'موضوع پیام'),
+            'contact_form_message_placeholder'=> Setting::get('contact_form_message_placeholder', 'پیام خود را بنویسید...'),
+            'contact_form_submit_text'     => Setting::get('contact_form_submit_text', 'ارسال پیام'),
+            'contact_form_loading_text'    => Setting::get('contact_form_loading_text', 'در حال ارسال...'),
+            'contact_form_success_message' => Setting::get('contact_form_success_message', ''),
+            'about_seo_title'              => Setting::get('about_seo_title', 'درباره ما'),
+            'about_hero_enabled'           => Setting::getBool('about_hero_enabled', true),
+            'about_hero_title'             => Setting::get('about_hero_title', 'درباره نکسو کورس'),
+            'about_hero_description'       => Setting::get('about_hero_description', ''),
+            'about_hero_image'             => Setting::get('about_hero_image') ?: null,
+            'about_mission_enabled'        => Setting::getBool('about_mission_enabled', true),
+            'about_mission_title'          => Setting::get('about_mission_title', 'مأموریت ما'),
+            'about_mission_paragraph1'     => Setting::get('about_mission_paragraph1', ''),
+            'about_mission_paragraph2'     => Setting::get('about_mission_paragraph2', ''),
+            'about_mission_image'          => Setting::get('about_mission_image') ?: null,
+            'about_mission_stats'          => Setting::getJson('about_mission_stats', Setting::defaultAboutStats()),
+            'about_values_enabled'         => Setting::getBool('about_values_enabled', true),
+            'about_values_title'           => Setting::get('about_values_title', 'ارزش‌های ما'),
+            'about_values'                 => Setting::getJson('about_values', Setting::defaultAboutValues()),
+            'about_cta_enabled'            => Setting::getBool('about_cta_enabled', true),
+            'about_cta_title'              => Setting::get('about_cta_title', 'آماده شروع هستی؟'),
+            'about_cta_subtitle'           => Setting::get('about_cta_subtitle', ''),
+            'about_cta_button_text'        => Setting::get('about_cta_button_text', 'مشاهده دوره‌ها'),
+            'about_cta_button_route'       => Setting::get('about_cta_button_route', 'courses.index'),
         ]);
     }
 
@@ -107,6 +143,8 @@ class ThemeSettings extends Page implements HasForms
                     Tabs\Tab::make('هدر')->icon('heroicon-o-bars-3-bottom-left')->schema($this->headerSchema()),
                     Tabs\Tab::make('صفحه اصلی')->icon('heroicon-o-home')->schema($this->homepageSchema()),
                     Tabs\Tab::make('فوتر')->icon('heroicon-o-rectangle-stack')->schema($this->footerSchema()),
+                    Tabs\Tab::make('تماس با ما')->icon('heroicon-o-envelope')->schema($this->contactSchema()),
+                    Tabs\Tab::make('درباره ما')->icon('heroicon-o-information-circle')->schema($this->aboutSchema()),
                 ])
                 ->persistTabInQueryString(),
         ])->statePath('data');
@@ -269,6 +307,96 @@ class ThemeSettings extends Page implements HasForms
         ];
     }
 
+    protected function contactSchema(): array
+    {
+        return [
+            Section::make('عنوان صفحه')->schema([
+                TextInput::make('contact_seo_title')->label('عنوان SEO')->maxLength(80),
+                TextInput::make('contact_page_title')->label('عنوان صفحه')->required()->maxLength(100),
+                TextInput::make('contact_page_subtitle')->label('زیرعنوان')->maxLength(200)->columnSpanFull(),
+            ])->columns(2),
+            Section::make('اطلاعات تماس')->schema([
+                Repeater::make('contact_info_items')->label('کارت‌های اطلاعات')->schema([
+                    TextInput::make('icon')->label('ایموجی')->maxLength(4),
+                    TextInput::make('title')->label('عنوان')->required()->maxLength(50),
+                    TextInput::make('value')->label('مقدار')->required()->maxLength(150),
+                    Select::make('bg')->label('رنگ پس‌زمینه')->options($this->bgColorOptions())->native(false),
+                    Toggle::make('visible')->label('نمایش')->default(true),
+                ])->columns(2)->collapsible()->reorderable()->columnSpanFull()
+                    ->itemLabel(fn (array $state): ?string => $state['title'] ?? 'آیتم'),
+            ]),
+            Section::make('فرم تماس')->schema([
+                Toggle::make('contact_form_enabled')->label('نمایش فرم')->default(true),
+                TextInput::make('contact_form_title')->label('عنوان فرم')->maxLength(80),
+                Grid::make(2)->schema([
+                    TextInput::make('contact_form_name_label')->label('برچسب نام')->maxLength(80),
+                    TextInput::make('contact_form_mobile_label')->label('برچسب موبایل')->maxLength(80),
+                    TextInput::make('contact_form_subject_label')->label('برچسب موضوع')->maxLength(80),
+                    TextInput::make('contact_form_message_label')->label('برچسب پیام')->maxLength(80),
+                    TextInput::make('contact_form_name_placeholder')->label('Placeholder نام')->maxLength(80),
+                    TextInput::make('contact_form_mobile_placeholder')->label('Placeholder موبایل')->maxLength(80),
+                    TextInput::make('contact_form_subject_placeholder')->label('Placeholder موضوع')->maxLength(80),
+                    TextInput::make('contact_form_message_placeholder')->label('Placeholder پیام')->maxLength(120),
+                    TextInput::make('contact_form_submit_text')->label('متن دکمه ارسال')->maxLength(50),
+                    TextInput::make('contact_form_loading_text')->label('متن در حال ارسال')->maxLength(50),
+                ]),
+                TextInput::make('contact_form_success_message')->label('پیام موفقیت پس از ارسال')->maxLength(200)->columnSpanFull(),
+            ]),
+        ];
+    }
+
+    protected function aboutSchema(): array
+    {
+        return [
+            Section::make('Hero')->schema([
+                Toggle::make('about_hero_enabled')->label('نمایش بخش')->default(true),
+                TextInput::make('about_seo_title')->label('عنوان SEO')->maxLength(80),
+                TextInput::make('about_hero_title')->label('عنوان')->maxLength(100),
+                Textarea::make('about_hero_description')->label('توضیحات')->rows(3)->columnSpanFull(),
+                FileUpload::make('about_hero_image')->label('تصویر پس‌زمینه (اختیاری)')->image()
+                    ->disk('public')->directory('theme/about')->visibility('public')->maxSize(4096)->columnSpanFull(),
+            ]),
+            Section::make('مأموریت')->schema([
+                Toggle::make('about_mission_enabled')->label('نمایش بخش')->default(true),
+                TextInput::make('about_mission_title')->label('عنوان')->maxLength(100),
+                Textarea::make('about_mission_paragraph1')->label('پاراگراف ۱')->rows(3)->columnSpanFull(),
+                Textarea::make('about_mission_paragraph2')->label('پاراگراف ۲')->rows(3)->columnSpanFull(),
+                FileUpload::make('about_mission_image')->label('تصویر کنار متن (اختیاری)')->image()
+                    ->disk('public')->directory('theme/about')->visibility('public')->maxSize(4096)->columnSpanFull(),
+                Repeater::make('about_mission_stats')->label('آمار')->schema([
+                    TextInput::make('value')->label('مقدار')->required()->maxLength(20),
+                    TextInput::make('label')->label('برچسب')->required()->maxLength(50),
+                ])->columns(2)->collapsible()->reorderable()->maxItems(6)->columnSpanFull(),
+            ]),
+            Section::make('ارزش‌ها')->schema([
+                Toggle::make('about_values_enabled')->label('نمایش بخش')->default(true),
+                TextInput::make('about_values_title')->label('عنوان')->maxLength(100),
+                Repeater::make('about_values')->label('ارزش‌ها')->schema([
+                    TextInput::make('icon')->label('ایموجی')->maxLength(4),
+                    TextInput::make('title')->label('عنوان')->required()->maxLength(60),
+                    Textarea::make('desc')->label('توضیح')->rows(2)->maxLength(300),
+                ])->columns(2)->collapsible()->reorderable()->maxItems(8)->columnSpanFull(),
+            ]),
+            Section::make('دعوت به اقدام (CTA)')->schema([
+                Toggle::make('about_cta_enabled')->label('نمایش بخش')->default(true),
+                TextInput::make('about_cta_title')->label('عنوان')->maxLength(100),
+                TextInput::make('about_cta_subtitle')->label('زیرعنوان')->maxLength(150),
+                Grid::make(2)->schema([
+                    TextInput::make('about_cta_button_text')->label('متن دکمه')->maxLength(50),
+                    Select::make('about_cta_button_route')->label('لینک دکمه')->options($this->routeOptions())->searchable()->native(false),
+                ]),
+            ]),
+        ];
+    }
+
+    protected function bgColorOptions(): array
+    {
+        return [
+            'bg-blue-50' => 'آبی', 'bg-green-50' => 'سبز', 'bg-purple-50' => 'بنفش',
+            'bg-yellow-50' => 'زرد', 'bg-pink-50' => 'صورتی', 'bg-orange-50' => 'نارنجی',
+        ];
+    }
+
     protected function linkRepeaterSchema(): array
     {
         return [
@@ -350,6 +478,42 @@ class ThemeSettings extends Page implements HasForms
             'footer_show_contact_link'     => ($data['footer_show_contact_link'] ?? true) ? '1' : '0',
             'footer_contact_link_text'     => $data['footer_contact_link_text'] ?? '',
             'footer_copyright'             => $data['footer_copyright'] ?? '',
+            'contact_seo_title'            => $data['contact_seo_title'] ?? 'تماس با ما',
+            'contact_page_title'           => $data['contact_page_title'] ?? 'تماس با ما',
+            'contact_page_subtitle'        => $data['contact_page_subtitle'] ?? '',
+            'contact_info_items'           => json_encode($data['contact_info_items'] ?? [], JSON_UNESCAPED_UNICODE),
+            'contact_form_enabled'         => ($data['contact_form_enabled'] ?? true) ? '1' : '0',
+            'contact_form_title'           => $data['contact_form_title'] ?? '',
+            'contact_form_name_label'      => $data['contact_form_name_label'] ?? '',
+            'contact_form_mobile_label'    => $data['contact_form_mobile_label'] ?? '',
+            'contact_form_subject_label'   => $data['contact_form_subject_label'] ?? '',
+            'contact_form_message_label'   => $data['contact_form_message_label'] ?? '',
+            'contact_form_name_placeholder'=> $data['contact_form_name_placeholder'] ?? '',
+            'contact_form_mobile_placeholder'=> $data['contact_form_mobile_placeholder'] ?? '',
+            'contact_form_subject_placeholder'=> $data['contact_form_subject_placeholder'] ?? '',
+            'contact_form_message_placeholder'=> $data['contact_form_message_placeholder'] ?? '',
+            'contact_form_submit_text'     => $data['contact_form_submit_text'] ?? '',
+            'contact_form_loading_text'    => $data['contact_form_loading_text'] ?? '',
+            'contact_form_success_message' => $data['contact_form_success_message'] ?? '',
+            'about_seo_title'              => $data['about_seo_title'] ?? 'درباره ما',
+            'about_hero_enabled'           => ($data['about_hero_enabled'] ?? true) ? '1' : '0',
+            'about_hero_title'             => $data['about_hero_title'] ?? '',
+            'about_hero_description'       => $data['about_hero_description'] ?? '',
+            'about_hero_image'             => $this->extractUploadPath($data['about_hero_image'] ?? null) ?? '',
+            'about_mission_enabled'        => ($data['about_mission_enabled'] ?? true) ? '1' : '0',
+            'about_mission_title'          => $data['about_mission_title'] ?? '',
+            'about_mission_paragraph1'     => $data['about_mission_paragraph1'] ?? '',
+            'about_mission_paragraph2'     => $data['about_mission_paragraph2'] ?? '',
+            'about_mission_image'          => $this->extractUploadPath($data['about_mission_image'] ?? null) ?? '',
+            'about_mission_stats'          => json_encode($data['about_mission_stats'] ?? [], JSON_UNESCAPED_UNICODE),
+            'about_values_enabled'         => ($data['about_values_enabled'] ?? true) ? '1' : '0',
+            'about_values_title'           => $data['about_values_title'] ?? '',
+            'about_values'                 => json_encode($data['about_values'] ?? [], JSON_UNESCAPED_UNICODE),
+            'about_cta_enabled'            => ($data['about_cta_enabled'] ?? true) ? '1' : '0',
+            'about_cta_title'              => $data['about_cta_title'] ?? '',
+            'about_cta_subtitle'           => $data['about_cta_subtitle'] ?? '',
+            'about_cta_button_text'        => $data['about_cta_button_text'] ?? '',
+            'about_cta_button_route'       => $data['about_cta_button_route'] ?? 'courses.index',
         ], 'theme');
 
         $this->fillFormFromSettings();
