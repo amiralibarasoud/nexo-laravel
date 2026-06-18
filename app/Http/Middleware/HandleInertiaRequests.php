@@ -36,7 +36,9 @@ class HandleInertiaRequests extends Middleware
             ],
             'jalali_now' => toJalali(now(), 'Y/m/d'),
             'theme'      => fn () => [
-                'header' => Setting::headerConfig(),
+                'header'   => Setting::headerConfig(),
+                'homepage' => Setting::homepageConfig(),
+                'footer'   => Setting::footerConfig(),
             ],
         ];
     }

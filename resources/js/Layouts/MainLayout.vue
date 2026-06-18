@@ -27,49 +27,11 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-gray-300 mt-20">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div class="md:col-span-2">
-            <div class="flex items-center gap-2 mb-4">
-              <div class="w-9 h-9 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center">
-                <span class="text-white font-bold text-lg">N</span>
-              </div>
-              <span class="text-xl font-bold text-white">نکسو کورس</span>
-            </div>
-            <p class="text-gray-400 leading-relaxed text-sm max-w-xs">
-              پلتفرم یادگیری آنلاین با بهترین دوره‌های متنی و صوتی. یادگیری را به شیوه‌ای جدید تجربه کنید.
-            </p>
-          </div>
-          <div>
-            <h4 class="text-white font-semibold mb-4">دسترسی سریع</h4>
-            <ul class="space-y-2 text-sm">
-              <li><Link :href="route('home')" class="hover:text-white transition-colors">خانه</Link></li>
-              <li><Link :href="route('courses.index')" class="hover:text-white transition-colors">دوره‌ها</Link></li>
-              <li><Link :href="route('about')" class="hover:text-white transition-colors">درباره ما</Link></li>
-              <li><Link :href="route('terms')" class="hover:text-white transition-colors">قوانین و مقررات</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 class="text-white font-semibold mb-4">تماس با ما</h4>
-            <ul class="space-y-2 text-sm text-gray-400">
-              <li>info@nexocourse.ir</li>
-              <li><Link :href="route('contact')" class="hover:text-white transition-colors">فرم تماس</Link></li>
-            </ul>
-          </div>
-        </div>
-        <div class="border-t border-gray-800 mt-8 pt-6 text-center text-sm text-gray-500">
-          تمامی حقوق برای نکسو کورس محفوظ است © {{ currentJalaliYear }}
-        </div>
-      </div>
-    </footer>
+    <SiteFooter />
   </div>
 </template>
 
 <script setup>
-import { Link } from '@inertiajs/vue3';
-import { jalaliYear } from '@/Composables/useJalali';
 import SiteHeader from '@/Components/SiteHeader.vue';
-
-const currentJalaliYear = jalaliYear();
+import SiteFooter from '@/Components/SiteFooter.vue';
 </script>

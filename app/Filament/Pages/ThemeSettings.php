@@ -6,11 +6,11 @@ use App\Models\Setting;
 use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -39,10 +39,8 @@ class ThemeSettings extends Page implements HasForms
 
     protected function fillFormFromSettings(): void
     {
-        $logo = Setting::get('header_logo');
-
         $this->form->fill([
-            'header_logo'                  => $logo ?: null,
+            'header_logo'                  => Setting::get('header_logo') ?: null,
             'header_logo_letter'           => Setting::get('header_logo_letter', 'N'),
             'header_show_text_logo'        => Setting::getBool('header_show_text_logo', true),
             'header_site_name'             => Setting::get('header_site_name', 'نکسو'),
@@ -55,6 +53,49 @@ class ThemeSettings extends Page implements HasForms
             'header_announcement_text'     => Setting::get('header_announcement_text', ''),
             'header_announcement_link'     => Setting::get('header_announcement_link', ''),
             'header_widgets'               => Setting::getJson('header_widgets', []),
+            'home_hero_enabled'            => Setting::getBool('home_hero_enabled', true),
+            'home_hero_badge'              => Setting::get('home_hero_badge', ''),
+            'home_hero_title_before'       => Setting::get('home_hero_title_before', 'یادگیری با'),
+            'home_hero_highlight1'         => Setting::get('home_hero_highlight1', 'صدای'),
+            'home_hero_title_middle'       => Setting::get('home_hero_title_middle', 'استاد یا'),
+            'home_hero_highlight2'         => Setting::get('home_hero_highlight2', 'متن'),
+            'home_hero_title_suffix'       => Setting::get('home_hero_title_suffix', 'انتخاب با توست.'),
+            'home_hero_description'        => Setting::get('home_hero_description', ''),
+            'home_hero_cta_text'           => Setting::get('home_hero_cta_text', 'مشاهده دوره‌ها'),
+            'home_hero_cta_route'          => Setting::get('home_hero_cta_route', 'courses.index'),
+            'home_hero_image'              => Setting::get('home_hero_image') ?: null,
+            'home_stats_enabled'           => Setting::getBool('home_stats_enabled', true),
+            'home_stats'                   => Setting::getJson('home_stats', Setting::defaultHomeStats()),
+            'home_steps_enabled'           => Setting::getBool('home_steps_enabled', true),
+            'home_steps_title'             => Setting::get('home_steps_title', 'چطور کار می‌کنه؟'),
+            'home_steps_subtitle'          => Setting::get('home_steps_subtitle', 'در چند قدم ساده شروع کن'),
+            'home_steps'                   => Setting::getJson('home_steps', Setting::defaultHomeSteps()),
+            'home_categories_enabled'      => Setting::getBool('home_categories_enabled', true),
+            'home_categories_title'        => Setting::get('home_categories_title', 'دسته‌بندی‌ها'),
+            'home_featured_enabled'        => Setting::getBool('home_featured_enabled', true),
+            'home_featured_title'          => Setting::get('home_featured_title', 'دوره‌های ویژه'),
+            'home_featured_subtitle'       => Setting::get('home_featured_subtitle', 'بهترین دوره‌ها برای شما'),
+            'home_featured_link_text'      => Setting::get('home_featured_link_text', 'مشاهده همه'),
+            'home_blog_enabled'            => Setting::getBool('home_blog_enabled', true),
+            'home_blog_title'              => Setting::get('home_blog_title', 'آخرین مقالات'),
+            'home_blog_subtitle'           => Setting::get('home_blog_subtitle', 'بخوان، یاد بگیر، رشد کن'),
+            'home_blog_link_text'          => Setting::get('home_blog_link_text', 'همه مقالات'),
+            'home_content_types_enabled'   => Setting::getBool('home_content_types_enabled', true),
+            'home_content_types_title'     => Setting::get('home_content_types_title', 'دو راه برای یادگیری'),
+            'home_content_types_subtitle'  => Setting::get('home_content_types_subtitle', 'بعد از خرید، خودت انتخاب می‌کنی'),
+            'home_content_cards'           => Setting::getJson('home_content_cards', Setting::defaultHomeContentCards()),
+            'footer_logo'                  => Setting::get('footer_logo') ?: null,
+            'footer_logo_letter'           => Setting::get('footer_logo_letter', 'N'),
+            'footer_site_name'             => Setting::get('footer_site_name', 'نکسو کورس'),
+            'footer_description'           => Setting::get('footer_description', ''),
+            'footer_links_title'           => Setting::get('footer_links_title', 'دسترسی سریع'),
+            'footer_links'                 => Setting::getJson('footer_links', Setting::defaultFooterLinks()),
+            'footer_contact_title'         => Setting::get('footer_contact_title', 'تماس با ما'),
+            'footer_email'                 => Setting::get('footer_email', ''),
+            'footer_phone'                 => Setting::get('footer_phone', ''),
+            'footer_show_contact_link'     => Setting::getBool('footer_show_contact_link', true),
+            'footer_contact_link_text'     => Setting::get('footer_contact_link_text', 'فرم تماس'),
+            'footer_copyright'             => Setting::get('footer_copyright', 'تمامی حقوق برای نکسو کورس محفوظ است © {year}'),
         ]);
     }
 
@@ -63,25 +104,9 @@ class ThemeSettings extends Page implements HasForms
         return $form->schema([
             Tabs::make('theme_tabs')
                 ->tabs([
-                    Tabs\Tab::make('هدر')
-                        ->icon('heroicon-o-bars-3-bottom-left')
-                        ->schema($this->headerSchema()),
-
-                    Tabs\Tab::make('صفحه اصلی')
-                        ->icon('heroicon-o-home')
-                        ->schema([
-                            Placeholder::make('homepage_coming_soon')
-                                ->label('')
-                                ->content('تنظیمات صفحه اصلی به زودی اضافه می‌شود.'),
-                        ]),
-
-                    Tabs\Tab::make('فوتر')
-                        ->icon('heroicon-o-rectangle-stack')
-                        ->schema([
-                            Placeholder::make('footer_coming_soon')
-                                ->label('')
-                                ->content('تنظیمات فوتر به زودی اضافه می‌شود.'),
-                        ]),
+                    Tabs\Tab::make('هدر')->icon('heroicon-o-bars-3-bottom-left')->schema($this->headerSchema()),
+                    Tabs\Tab::make('صفحه اصلی')->icon('heroicon-o-home')->schema($this->homepageSchema()),
+                    Tabs\Tab::make('فوتر')->icon('heroicon-o-rectangle-stack')->schema($this->footerSchema()),
                 ])
                 ->persistTabInQueryString(),
         ])->statePath('data');
@@ -90,189 +115,177 @@ class ThemeSettings extends Page implements HasForms
     protected function headerSchema(): array
     {
         return [
-            Section::make('برندینگ و لوگو')
-                ->description('لوگو، نام سایت و موقعیت نمایش در هدر')
-                ->icon('heroicon-o-photo')
-                ->schema([
-                    FileUpload::make('header_logo')
-                        ->label('تصویر لوگو')
-                        ->image()
-                        ->disk('public')
-                        ->directory('theme/logo')
-                        ->visibility('public')
-                        ->imageResizeMode('contain')
-                        ->maxSize(2048)
-                        ->helperText('در صورت آپلود، تصویر جایگزین لوگوی متنی می‌شود.')
-                        ->columnSpanFull(),
-
-                    Grid::make(2)->schema([
-                        TextInput::make('header_site_name')
-                            ->label('نام سایت')
-                            ->required()
-                            ->maxLength(50),
-
-                        TextInput::make('header_site_name_highlight')
-                            ->label('بخش برجسته نام')
-                            ->maxLength(30)
-                            ->helperText('مثلاً «کورس» در «نکسو کورس»'),
-
-                        TextInput::make('header_logo_letter')
-                            ->label('حرف لوگوی متنی')
-                            ->maxLength(2)
-                            ->helperText('وقتی تصویر لوگو ندارید، این حرف نمایش داده می‌شود.'),
-
-                        Select::make('header_logo_position')
-                            ->label('موقعیت لوگو')
-                            ->options([
-                                'start'  => 'راست (پیش‌فرض)',
-                                'center' => 'وسط',
-                                'end'    => 'چپ',
-                            ])
-                            ->required()
-                            ->native(false),
-
-                        Toggle::make('header_show_text_logo')
-                            ->label('نمایش نام سایت کنار لوگو')
-                            ->helperText('اگر غیرفعال باشد فقط تصویر/حرف لوگو نمایش داده می‌شود.'),
-
-                        Toggle::make('header_sticky')
-                            ->label('هدر چسبان (Sticky)')
-                            ->helperText('هدر هنگام اسکرول در بالای صفحه ثابت بماند.'),
-                    ]),
+            Section::make('برندینگ و لوگو')->icon('heroicon-o-photo')->schema([
+                FileUpload::make('header_logo')->label('تصویر لوگو')->image()
+                    ->disk('public')->directory('theme/logo')->visibility('public')->maxSize(2048)->columnSpanFull(),
+                Grid::make(2)->schema([
+                    TextInput::make('header_site_name')->label('نام سایت')->required()->maxLength(50),
+                    TextInput::make('header_site_name_highlight')->label('بخش برجسته نام')->maxLength(30),
+                    TextInput::make('header_logo_letter')->label('حرف لوگوی متنی')->maxLength(2),
+                    Select::make('header_logo_position')->label('موقعیت لوگو')->options([
+                        'start' => 'راست', 'center' => 'وسط', 'end' => 'چپ',
+                    ])->required()->native(false),
+                    Toggle::make('header_show_text_logo')->label('نمایش نام کنار لوگو'),
+                    Toggle::make('header_sticky')->label('هدر چسبان'),
                 ]),
+            ]),
+            Section::make('منوی ناوبری')->icon('heroicon-o-link')->schema([
+                Repeater::make('header_nav_links')->label('آیتم‌های منو')->schema($this->linkRepeaterSchema())
+                    ->columns(2)->collapsible()->reorderable()->columnSpanFull()
+                    ->itemLabel(fn (array $state): ?string => $state['label'] ?? 'آیتم منو'),
+            ]),
+            Section::make('نوار اعلان')->schema([
+                Toggle::make('header_announcement_enabled')->label('فعال')->live(),
+                TextInput::make('header_announcement_text')->label('متن')->maxLength(200)
+                    ->visible(fn ($get) => $get('header_announcement_enabled')),
+                TextInput::make('header_announcement_link')->label('لینک')->url()->nullable()
+                    ->visible(fn ($get) => $get('header_announcement_enabled')),
+            ]),
+            Section::make('ویجت‌های متنی')->schema([
+                Repeater::make('header_widgets')->label('ویجت‌ها')->schema([
+                    Select::make('type')->label('نوع')->options(['text' => 'متن', 'link' => 'لینک', 'badge' => 'برچسب'])->required()->native(false),
+                    TextInput::make('content')->label('متن')->required()->maxLength(100),
+                    TextInput::make('link')->label('لینک')->url()->nullable(),
+                    Select::make('position')->label('موقعیت')->options(['before_auth' => 'قبل از ورود', 'after_nav' => 'بعد از منو'])->native(false),
+                    Toggle::make('visible')->label('نمایش')->default(true),
+                ])->columns(2)->collapsible()->reorderable()->columnSpanFull(),
+            ]),
+            Section::make('دکمه ورود')->schema([
+                TextInput::make('header_login_text')->label('متن دکمه')->required()->maxLength(50),
+            ]),
+        ];
+    }
 
-            Section::make('منوی ناوبری')
-                ->description('لینک‌های منوی اصلی سایت')
-                ->icon('heroicon-o-link')
-                ->schema([
-                    Repeater::make('header_nav_links')
-                        ->label('آیتم‌های منو')
-                        ->schema([
-                            TextInput::make('label')
-                                ->label('عنوان')
-                                ->required()
-                                ->maxLength(50),
-
-                            Select::make('route_name')
-                                ->label('صفحه')
-                                ->options($this->routeOptions())
-                                ->searchable()
-                                ->live(),
-
-                            TextInput::make('url')
-                                ->label('لینک سفارشی')
-                                ->url()
-                                ->nullable()
-                                ->placeholder('https://...')
-                                ->visible(fn ($get) => empty($get('route_name')))
-                                ->helperText('فقط وقتی «لینک سفارشی» انتخاب شده باشد.'),
-
-                            Toggle::make('visible')
-                                ->label('نمایش')
-                                ->default(true),
-                        ])
-                        ->columns(2)
-                        ->collapsible()
-                        ->itemLabel(fn (array $state): ?string => $state['label'] ?? 'آیتم منو')
-                        ->defaultItems(0)
-                        ->addActionLabel('افزودن آیتم منو')
-                        ->reorderable()
-                        ->columnSpanFull(),
+    protected function homepageSchema(): array
+    {
+        return [
+            Section::make('بخش Hero')->description('بنر اصلی بالای صفحه')->icon('heroicon-o-sparkles')->schema([
+                Toggle::make('home_hero_enabled')->label('نمایش بخش Hero')->default(true),
+                TextInput::make('home_hero_badge')->label('برچسب بالای عنوان')->maxLength(100)->columnSpanFull(),
+                Grid::make(2)->schema([
+                    TextInput::make('home_hero_title_before')->label('متن قبل از برجسته ۱')->maxLength(80),
+                    TextInput::make('home_hero_highlight1')->label('برجسته ۱ (زرد)')->maxLength(40),
+                    TextInput::make('home_hero_title_middle')->label('متن میانی')->maxLength(80),
+                    TextInput::make('home_hero_highlight2')->label('برجسته ۲ (سبز)')->maxLength(40),
+                    TextInput::make('home_hero_title_suffix')->label('زیرعنوان')->maxLength(80)->columnSpanFull(),
                 ]),
-
-            Section::make('نوار اعلان')
-                ->description('یک نوار متنی بالای هدر (مثلاً تخفیف یا اطلاعیه)')
-                ->icon('heroicon-o-megaphone')
-                ->schema([
-                    Toggle::make('header_announcement_enabled')
-                        ->label('فعال‌سازی نوار اعلان')
-                        ->live(),
-
-                    TextInput::make('header_announcement_text')
-                        ->label('متن اعلان')
-                        ->maxLength(200)
-                        ->visible(fn ($get) => $get('header_announcement_enabled')),
-
-                    TextInput::make('header_announcement_link')
-                        ->label('لینک اعلان (اختیاری)')
-                        ->url()
-                        ->nullable()
-                        ->visible(fn ($get) => $get('header_announcement_enabled')),
+                Textarea::make('home_hero_description')->label('توضیحات')->rows(3)->columnSpanFull(),
+                Grid::make(2)->schema([
+                    TextInput::make('home_hero_cta_text')->label('متن دکمه')->maxLength(50),
+                    Select::make('home_hero_cta_route')->label('لینک دکمه')->options($this->routeOptions())->searchable()->native(false),
                 ]),
+                FileUpload::make('home_hero_image')->label('تصویر پس‌زمینه (اختیاری)')->image()
+                    ->disk('public')->directory('theme/home')->visibility('public')->maxSize(4096)->columnSpanFull(),
+            ]),
+            Section::make('آمار Hero')->schema([
+                Toggle::make('home_stats_enabled')->label('نمایش آمار')->default(true),
+                Repeater::make('home_stats')->label('آیتم‌های آمار')->schema([
+                    Select::make('type')->label('نوع مقدار')->options([
+                        'dynamic_courses'  => 'تعداد دوره‌ها (خودکار)',
+                        'dynamic_students' => 'تعداد دانش‌آموز (خودکار)',
+                        'manual'           => 'عدد دستی',
+                    ])->required()->live()->native(false),
+                    TextInput::make('value')->label('مقدار دستی')->maxLength(20)
+                        ->visible(fn ($get) => $get('type') === 'manual'),
+                    TextInput::make('label')->label('برچسب')->required()->maxLength(50),
+                    TextInput::make('suffix')->label('پسوند')->maxLength(5)->placeholder('+'),
+                ])->columns(2)->collapsible()->reorderable()->maxItems(4)->columnSpanFull(),
+            ]),
+            Section::make('چطور کار می‌کنه؟')->schema([
+                Toggle::make('home_steps_enabled')->label('نمایش بخش')->default(true),
+                TextInput::make('home_steps_title')->label('عنوان')->maxLength(100),
+                TextInput::make('home_steps_subtitle')->label('زیرعنوان')->maxLength(150),
+                Repeater::make('home_steps')->label('مراحل')->schema([
+                    TextInput::make('emoji')->label('ایموجی')->maxLength(4),
+                    TextInput::make('title')->label('عنوان')->required()->maxLength(80),
+                    Textarea::make('desc')->label('توضیح')->rows(2)->maxLength(300),
+                    Select::make('bg')->label('رنگ پس‌زمینه')->options([
+                        'bg-blue-50' => 'آبی', 'bg-green-50' => 'سبز', 'bg-purple-50' => 'بنفش',
+                        'bg-yellow-50' => 'زرد', 'bg-pink-50' => 'صورتی',
+                    ])->native(false),
+                ])->columns(2)->collapsible()->reorderable()->maxItems(6)->columnSpanFull(),
+            ]),
+            Section::make('دسته‌بندی‌ها')->schema([
+                Toggle::make('home_categories_enabled')->label('نمایش بخش')->default(true),
+                TextInput::make('home_categories_title')->label('عنوان')->maxLength(100),
+            ]),
+            Section::make('دوره‌های ویژه')->schema([
+                Toggle::make('home_featured_enabled')->label('نمایش بخش')->default(true),
+                TextInput::make('home_featured_title')->label('عنوان')->maxLength(100),
+                TextInput::make('home_featured_subtitle')->label('زیرعنوان')->maxLength(150),
+                TextInput::make('home_featured_link_text')->label('متن لینک «مشاهده همه»')->maxLength(50),
+            ]),
+            Section::make('آخرین مقالات')->schema([
+                Toggle::make('home_blog_enabled')->label('نمایش بخش')->default(true),
+                TextInput::make('home_blog_title')->label('عنوان')->maxLength(100),
+                TextInput::make('home_blog_subtitle')->label('زیرعنوان')->maxLength(150),
+                TextInput::make('home_blog_link_text')->label('متن لینک')->maxLength(50),
+            ]),
+            Section::make('دو راه برای یادگیری')->schema([
+                Toggle::make('home_content_types_enabled')->label('نمایش بخش')->default(true),
+                TextInput::make('home_content_types_title')->label('عنوان')->maxLength(100),
+                TextInput::make('home_content_types_subtitle')->label('زیرعنوان')->maxLength(150),
+                Repeater::make('home_content_cards')->label('کارت‌ها')->schema([
+                    TextInput::make('emoji')->label('ایموجی')->maxLength(4),
+                    TextInput::make('title')->label('عنوان کارت')->required()->maxLength(80),
+                    Repeater::make('items')->label('ویژگی‌ها')->simple(
+                        TextInput::make('item')->label('متن')->required()->maxLength(120),
+                    )->columnSpanFull(),
+                ])->columns(2)->collapsible()->reorderable()->maxItems(4)->columnSpanFull(),
+            ]),
+        ];
+    }
 
-            Section::make('ویجت‌های متنی')
-                ->description('متن‌های اضافی در کنار منو یا دکمه ورود')
-                ->icon('heroicon-o-chat-bubble-bottom-center-text')
-                ->schema([
-                    Repeater::make('header_widgets')
-                        ->label('ویجت‌ها')
-                        ->schema([
-                            Select::make('type')
-                                ->label('نوع')
-                                ->options([
-                                    'text'  => 'متن ساده',
-                                    'link'  => 'لینک',
-                                    'badge' => 'برچسب',
-                                ])
-                                ->required()
-                                ->native(false),
-
-                            TextInput::make('content')
-                                ->label('متن')
-                                ->required()
-                                ->maxLength(100),
-
-                            TextInput::make('link')
-                                ->label('لینک')
-                                ->url()
-                                ->nullable()
-                                ->visible(fn ($get) => in_array($get('type'), ['link', 'badge'], true)),
-
-                            Select::make('position')
-                                ->label('موقعیت')
-                                ->options([
-                                    'before_auth' => 'قبل از دکمه ورود',
-                                    'after_nav'   => 'بعد از منو',
-                                ])
-                                ->default('before_auth')
-                                ->native(false),
-
-                            Toggle::make('visible')
-                                ->label('نمایش')
-                                ->default(true),
-                        ])
-                        ->columns(2)
-                        ->collapsible()
-                        ->itemLabel(fn (array $state): ?string => $state['content'] ?? 'ویجت')
-                        ->defaultItems(0)
-                        ->addActionLabel('افزودن ویجت')
-                        ->reorderable()
-                        ->columnSpanFull(),
+    protected function footerSchema(): array
+    {
+        return [
+            Section::make('برندینگ فوتر')->icon('heroicon-o-photo')->schema([
+                FileUpload::make('footer_logo')->label('لوگوی فوتر')->image()
+                    ->disk('public')->directory('theme/footer')->visibility('public')->maxSize(2048)->columnSpanFull(),
+                Grid::make(2)->schema([
+                    TextInput::make('footer_logo_letter')->label('حرف لوگوی متنی')->maxLength(2),
+                    TextInput::make('footer_site_name')->label('نام سایت')->required()->maxLength(80),
                 ]),
+                Textarea::make('footer_description')->label('توضیحات')->rows(3)->columnSpanFull(),
+            ]),
+            Section::make('لینک‌های سریع')->schema([
+                TextInput::make('footer_links_title')->label('عنوان ستون')->maxLength(80),
+                Repeater::make('footer_links')->label('لینک‌ها')->schema($this->linkRepeaterSchema())
+                    ->columns(2)->collapsible()->reorderable()->columnSpanFull()
+                    ->itemLabel(fn (array $state): ?string => $state['label'] ?? 'لینک'),
+            ]),
+            Section::make('تماس با ما')->schema([
+                TextInput::make('footer_contact_title')->label('عنوان ستون')->maxLength(80),
+                TextInput::make('footer_email')->label('ایمیل')->email()->maxLength(120),
+                TextInput::make('footer_phone')->label('تلفن')->tel()->maxLength(30),
+                Toggle::make('footer_show_contact_link')->label('نمایش لینک فرم تماس'),
+                TextInput::make('footer_contact_link_text')->label('متن لینک تماس')->maxLength(50),
+            ]),
+            Section::make('کپی‌رایت')->schema([
+                TextInput::make('footer_copyright')->label('متن پایین فوتر')
+                    ->helperText('از {year} برای سال جلالی استفاده کنید.')
+                    ->maxLength(200)->columnSpanFull(),
+            ]),
+        ];
+    }
 
-            Section::make('دکمه ورود')
-                ->icon('heroicon-o-user-circle')
-                ->schema([
-                    TextInput::make('header_login_text')
-                        ->label('متن دکمه ورود')
-                        ->required()
-                        ->maxLength(50)
-                        ->default('ورود / ثبت‌نام'),
-                ]),
+    protected function linkRepeaterSchema(): array
+    {
+        return [
+            TextInput::make('label')->label('عنوان')->required()->maxLength(50),
+            Select::make('route_name')->label('صفحه')->options($this->routeOptions())->searchable()->live(),
+            TextInput::make('url')->label('لینک سفارشی')->url()->nullable()
+                ->visible(fn ($get) => empty($get('route_name'))),
+            Toggle::make('visible')->label('نمایش')->default(true),
         ];
     }
 
     protected function routeOptions(): array
     {
         return [
-            'home'           => 'خانه',
-            'courses.index'  => 'دوره‌ها',
-            'blog.index'     => 'بلاگ',
-            'about'          => 'درباره ما',
-            'contact'        => 'تماس',
-            'terms'          => 'قوانین و مقررات',
-            'login'          => 'ورود',
-            ''               => '— لینک سفارشی —',
+            'home' => 'خانه', 'courses.index' => 'دوره‌ها', 'blog.index' => 'بلاگ',
+            'about' => 'درباره ما', 'contact' => 'تماس', 'terms' => 'قوانین', 'login' => 'ورود',
+            '' => '— لینک سفارشی —',
         ];
     }
 
@@ -280,10 +293,8 @@ class ThemeSettings extends Page implements HasForms
     {
         $data = $this->form->getState();
 
-        $logo = $this->extractUploadPath($data['header_logo'] ?? null) ?? '';
-
         Setting::setMany([
-            'header_logo'                  => $logo,
+            'header_logo'                  => $this->extractUploadPath($data['header_logo'] ?? null) ?? '',
             'header_logo_letter'           => $data['header_logo_letter'] ?? 'N',
             'header_show_text_logo'        => ($data['header_show_text_logo'] ?? true) ? '1' : '0',
             'header_site_name'             => $data['header_site_name'] ?? 'نکسو',
@@ -296,14 +307,70 @@ class ThemeSettings extends Page implements HasForms
             'header_announcement_text'     => $data['header_announcement_text'] ?? '',
             'header_announcement_link'     => $data['header_announcement_link'] ?? '',
             'header_widgets'               => json_encode($data['header_widgets'] ?? [], JSON_UNESCAPED_UNICODE),
+            'home_hero_enabled'            => ($data['home_hero_enabled'] ?? true) ? '1' : '0',
+            'home_hero_badge'              => $data['home_hero_badge'] ?? '',
+            'home_hero_title_before'       => $data['home_hero_title_before'] ?? '',
+            'home_hero_highlight1'         => $data['home_hero_highlight1'] ?? '',
+            'home_hero_title_middle'       => $data['home_hero_title_middle'] ?? '',
+            'home_hero_highlight2'         => $data['home_hero_highlight2'] ?? '',
+            'home_hero_title_suffix'       => $data['home_hero_title_suffix'] ?? '',
+            'home_hero_description'        => $data['home_hero_description'] ?? '',
+            'home_hero_cta_text'           => $data['home_hero_cta_text'] ?? '',
+            'home_hero_cta_route'          => $data['home_hero_cta_route'] ?? 'courses.index',
+            'home_hero_image'              => $this->extractUploadPath($data['home_hero_image'] ?? null) ?? '',
+            'home_stats_enabled'           => ($data['home_stats_enabled'] ?? true) ? '1' : '0',
+            'home_stats'                   => json_encode($data['home_stats'] ?? [], JSON_UNESCAPED_UNICODE),
+            'home_steps_enabled'           => ($data['home_steps_enabled'] ?? true) ? '1' : '0',
+            'home_steps_title'             => $data['home_steps_title'] ?? '',
+            'home_steps_subtitle'          => $data['home_steps_subtitle'] ?? '',
+            'home_steps'                   => json_encode($data['home_steps'] ?? [], JSON_UNESCAPED_UNICODE),
+            'home_categories_enabled'      => ($data['home_categories_enabled'] ?? true) ? '1' : '0',
+            'home_categories_title'        => $data['home_categories_title'] ?? '',
+            'home_featured_enabled'        => ($data['home_featured_enabled'] ?? true) ? '1' : '0',
+            'home_featured_title'          => $data['home_featured_title'] ?? '',
+            'home_featured_subtitle'       => $data['home_featured_subtitle'] ?? '',
+            'home_featured_link_text'      => $data['home_featured_link_text'] ?? '',
+            'home_blog_enabled'            => ($data['home_blog_enabled'] ?? true) ? '1' : '0',
+            'home_blog_title'              => $data['home_blog_title'] ?? '',
+            'home_blog_subtitle'           => $data['home_blog_subtitle'] ?? '',
+            'home_blog_link_text'          => $data['home_blog_link_text'] ?? '',
+            'home_content_types_enabled'   => ($data['home_content_types_enabled'] ?? true) ? '1' : '0',
+            'home_content_types_title'     => $data['home_content_types_title'] ?? '',
+            'home_content_types_subtitle'  => $data['home_content_types_subtitle'] ?? '',
+            'home_content_cards'           => json_encode($this->normalizeContentCards($data['home_content_cards'] ?? []), JSON_UNESCAPED_UNICODE),
+            'footer_logo'                  => $this->extractUploadPath($data['footer_logo'] ?? null) ?? '',
+            'footer_logo_letter'           => $data['footer_logo_letter'] ?? 'N',
+            'footer_site_name'             => $data['footer_site_name'] ?? '',
+            'footer_description'           => $data['footer_description'] ?? '',
+            'footer_links_title'           => $data['footer_links_title'] ?? '',
+            'footer_links'                 => json_encode($data['footer_links'] ?? [], JSON_UNESCAPED_UNICODE),
+            'footer_contact_title'         => $data['footer_contact_title'] ?? '',
+            'footer_email'                 => $data['footer_email'] ?? '',
+            'footer_phone'                 => $data['footer_phone'] ?? '',
+            'footer_show_contact_link'     => ($data['footer_show_contact_link'] ?? true) ? '1' : '0',
+            'footer_contact_link_text'     => $data['footer_contact_link_text'] ?? '',
+            'footer_copyright'             => $data['footer_copyright'] ?? '',
         ], 'theme');
 
         $this->fillFormFromSettings();
 
-        Notification::make()
-            ->title('تنظیمات هدر ذخیره شد ✅')
-            ->success()
-            ->send();
+        Notification::make()->title('تنظیمات قالب ذخیره شد ✅')->success()->send();
+    }
+
+    protected function normalizeContentCards(array $cards): array
+    {
+        return array_values(array_map(function (array $card) {
+            $items = $card['items'] ?? [];
+            if (isset($items[0]) && is_array($items[0]) && array_key_exists('item', $items[0])) {
+                $items = array_values(array_filter(array_map(fn ($row) => $row['item'] ?? null, $items)));
+            }
+
+            return [
+                'emoji' => $card['emoji'] ?? '',
+                'title' => $card['title'] ?? '',
+                'items' => array_values(array_filter($items)),
+            ];
+        }, $cards));
     }
 
     protected function extractUploadPath(mixed $value): ?string
@@ -328,11 +395,8 @@ class ThemeSettings extends Page implements HasForms
     protected function getFormActions(): array
     {
         return [
-            Action::make('save')
-                ->label('ذخیره تنظیمات')
-                ->submit('save')
-                ->icon('heroicon-o-check')
-                ->color('primary'),
+            Action::make('save')->label('ذخیره تنظیمات')->submit('save')
+                ->icon('heroicon-o-check')->color('primary'),
         ];
     }
 }
