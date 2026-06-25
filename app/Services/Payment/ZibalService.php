@@ -2,25 +2,25 @@
 
 namespace App\Services\Payment;
 
+use App\Models\Setting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class ZibalService
 {
-    private string $merchant;
     private string $apiBase = 'https://gateway.zibal.ir/v1';
     private string $paymentUrl = 'https://gateway.zibal.ir/start';
 
-    public function __construct()
+    private function merchant(): string
     {
-        $this->merchant = (string) (config('services.zibal.merchant') ?? 'zibal');
+        return Setting::paymentConfig()['zibal']['merchant'];
     }
 
     public function request(int $amount, string $callbackUrl, string $mobile = '', string $description = ''): array
     {
         try {
             $response = Http::post("{$this->apiBase}/request", [
-                'merchant' => $this->merchant,
+                'merchant' => $this->merchant(),
                 'amount' => $amount * 10, // Toman to Rial
                 'callbackUrl' => $callbackUrl,
                 'mobile' => $mobile,
@@ -49,7 +49,7 @@ class ZibalService
     {
         try {
             $response = Http::post("{$this->apiBase}/verify", [
-                'merchant' => $this->merchant,
+                'merchant' => $this->merchant(),
                 'trackId' => $trackId,
             ]);
 

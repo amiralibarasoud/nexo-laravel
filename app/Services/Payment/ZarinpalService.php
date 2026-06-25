@@ -2,33 +2,40 @@
 
 namespace App\Services\Payment;
 
+use App\Models\Setting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class ZarinpalService
 {
-    private string $merchantId;
-    private bool $sandbox;
-    private string $apiBase;
-    private string $paymentUrl;
-
-    public function __construct()
+    private function config(): array
     {
-        $this->merchantId = (string) (config('services.zarinpal.merchant_id') ?? '');
-        $this->sandbox = (bool) (config('services.zarinpal.sandbox') ?? true);
-        $this->apiBase = $this->sandbox
+        return Setting::paymentConfig()['zarinpal'];
+    }
+
+    private function apiBase(bool $sandbox): string
+    {
+        return $sandbox
             ? 'https://sandbox.zarinpal.com/pg/v4/payment'
             : 'https://api.zarinpal.com/pg/v4/payment';
-        $this->paymentUrl = $this->sandbox
+    }
+
+    private function paymentUrl(bool $sandbox): string
+    {
+        return $sandbox
             ? 'https://sandbox.zarinpal.com/pg/StartPay'
             : 'https://www.zarinpal.com/pg/StartPay';
     }
 
     public function request(int $amount, string $description, string $callbackUrl, string $mobile = ''): array
     {
+        $config  = $this->config();
+        $apiBase = $this->apiBase($config['sandbox']);
+        $payUrl  = $this->paymentUrl($config['sandbox']);
+
         try {
-            $response = Http::post("{$this->apiBase}/request.json", [
-                'merchant_id' => $this->merchantId,
+            $response = Http::post("{$apiBase}/request.json", [
+                'merchant_id' => $config['merchant_id'],
                 'amount' => $amount * 10, // Toman to Rial
                 'description' => $description,
                 'callback_url' => $callbackUrl,
@@ -41,7 +48,7 @@ class ZarinpalService
                 return [
                     'success' => true,
                     'authority' => $data['data']['authority'],
-                    'url' => $this->paymentUrl . '/' . $data['data']['authority'],
+                    'url' => $payUrl . '/' . $data['data']['authority'],
                 ];
             }
 
@@ -55,9 +62,12 @@ class ZarinpalService
 
     public function verify(string $authority, int $amount): array
     {
+        $config  = $this->config();
+        $apiBase = $this->apiBase($config['sandbox']);
+
         try {
-            $response = Http::post("{$this->apiBase}/verify.json", [
-                'merchant_id' => $this->merchantId,
+            $response = Http::post("{$apiBase}/verify.json", [
+                'merchant_id' => $config['merchant_id'],
                 'authority' => $authority,
                 'amount' => $amount * 10, // Toman to Rial
             ]);

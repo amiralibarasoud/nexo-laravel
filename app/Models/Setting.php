@@ -261,6 +261,57 @@ class Setting extends Model
         ];
     }
 
+    public static function paymentConfig(): array
+    {
+        $zarinpalMerchant = static::get('zarinpal_merchant_id');
+        $zibalMerchant    = static::get('zibal_merchant');
+
+        return [
+            'zarinpal' => [
+                'enabled'     => static::paymentGatewayEnabled('zarinpal'),
+                'merchant_id' => ! empty($zarinpalMerchant) ? $zarinpalMerchant : (string) (config('services.zarinpal.merchant_id') ?? ''),
+                'sandbox'     => static::get('zarinpal_sandbox') !== null
+                    ? static::getBool('zarinpal_sandbox', true)
+                    : (bool) (config('services.zarinpal.sandbox') ?? true),
+            ],
+            'zibal' => [
+                'enabled'  => static::paymentGatewayEnabled('zibal'),
+                'merchant' => ! empty($zibalMerchant) ? $zibalMerchant : (string) (config('services.zibal.merchant') ?? 'zibal'),
+            ],
+        ];
+    }
+
+    public static function paymentGatewayEnabled(string $gateway): bool
+    {
+        $key = "{$gateway}_enabled";
+
+        if (static::get($key) !== null) {
+            return static::getBool($key, false);
+        }
+
+        return match ($gateway) {
+            'zarinpal' => (bool) (config('services.zarinpal.enabled') ?? false),
+            'zibal'    => true,
+            default    => false,
+        };
+    }
+
+    public static function enabledGateways(): array
+    {
+        $config   = static::paymentConfig();
+        $gateways = [];
+
+        if ($config['zibal']['enabled']) {
+            $gateways[] = 'zibal';
+        }
+
+        if ($config['zarinpal']['enabled']) {
+            $gateways[] = 'zarinpal';
+        }
+
+        return $gateways;
+    }
+
     public static function seedDefaults(): void
     {
         $defaults = [
@@ -268,6 +319,11 @@ class Setting extends Model
             ['key' => 'sms_template_id', 'value' => '238380', 'group' => 'sms'],
             ['key' => 'sms_sandbox', 'value' => '1', 'group' => 'sms'],
             ['key' => 'sms_sandbox_code', 'value' => '12345', 'group' => 'sms'],
+            ['key' => 'zarinpal_enabled', 'value' => '0', 'group' => 'payment'],
+            ['key' => 'zarinpal_merchant_id', 'value' => '', 'group' => 'payment'],
+            ['key' => 'zarinpal_sandbox', 'value' => '1', 'group' => 'payment'],
+            ['key' => 'zibal_enabled', 'value' => '1', 'group' => 'payment'],
+            ['key' => 'zibal_merchant', 'value' => 'zibal', 'group' => 'payment'],
             ['key' => 'site_name', 'value' => 'نکسو کورس', 'group' => 'site'],
             ['key' => 'site_support_phone', 'value' => '', 'group' => 'site'],
             ['key' => 'site_support_email', 'value' => 'info@nexocourse.ir', 'group' => 'site'],

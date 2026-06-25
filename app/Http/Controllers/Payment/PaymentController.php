@@ -8,6 +8,7 @@ use App\Models\CouponUsage;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Order;
+use App\Models\Setting;
 use App\Models\Transaction;
 use App\Services\Payment\ZarinpalService;
 use App\Services\Payment\ZibalService;
@@ -39,6 +40,8 @@ class PaymentController extends Controller
                 ->with('info', 'شما قبلاً در این دوره ثبت‌نام کرده‌اید.');
         }
 
+        $paymentConfig = Setting::paymentConfig();
+
         return Inertia::render('Payment/Checkout', [
             'course' => [
                 'id' => $course->id,
@@ -53,17 +56,18 @@ class PaymentController extends Controller
                 'has_audio' => $course->has_audio,
             ],
             'gateways' => [
-                'zarinpal' => config('services.zarinpal.enabled', false),
-                'zibal' => true,
+                'zarinpal' => $paymentConfig['zarinpal']['enabled'],
+                'zibal' => $paymentConfig['zibal']['enabled'],
             ],
         ]);
     }
 
     public function initiatePayment(Request $request): RedirectResponse
     {
-        $allowedGateways = ['zibal'];
-        if (config('services.zarinpal.enabled', false)) {
-            $allowedGateways[] = 'zarinpal';
+        $allowedGateways = Setting::enabledGateways();
+
+        if (empty($allowedGateways)) {
+            return redirect()->back()->with('error', 'هیچ درگاه پرداختی فعال نیست.');
         }
 
         $request->validate([
