@@ -171,7 +171,6 @@
 
 <script setup>
 import { reactive, ref, computed } from 'vue';
-import { router } from '@inertiajs/vue3';
 import axios from 'axios';
 import MainLayout from '@/Layouts/MainLayout.vue';
 
@@ -235,14 +234,38 @@ function removeCoupon() {
 }
 
 function submitPayment() {
+  if (loading.value || !form.gateway) return;
   loading.value = true;
-  router.post(route('payment.initiate'), {
-    course_id:    props.course.id,
+
+  const htmlForm = document.createElement('form');
+  htmlForm.method = 'POST';
+  htmlForm.action = route('payment.initiate');
+
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+  if (csrfToken) {
+    const tokenInput = document.createElement('input');
+    tokenInput.type = 'hidden';
+    tokenInput.name = '_token';
+    tokenInput.value = csrfToken;
+    htmlForm.appendChild(tokenInput);
+  }
+
+  const fields = {
+    course_id: props.course.id,
     content_type: form.content_type,
-    gateway:      form.gateway,
-    coupon_code:  form.coupon_code || null,
-  }, {
-    onError: () => { loading.value = false; },
-  });
+    gateway: form.gateway,
+    coupon_code: form.coupon_code || '',
+  };
+
+  for (const [name, value] of Object.entries(fields)) {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = name;
+    input.value = value;
+    htmlForm.appendChild(input);
+  }
+
+  document.body.appendChild(htmlForm);
+  htmlForm.submit();
 }
 </script>

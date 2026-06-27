@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class PaymentController extends Controller
 {
@@ -62,7 +63,7 @@ class PaymentController extends Controller
         ]);
     }
 
-    public function initiatePayment(Request $request): RedirectResponse
+    public function initiatePayment(Request $request): RedirectResponse|HttpResponse
     {
         $allowedGateways = Setting::enabledGateways();
 
@@ -129,7 +130,7 @@ class PaymentController extends Controller
                         'amount' => $amount,
                         'status' => 'initiated',
                     ]);
-                    return redirect()->away($result['url']);
+                    return Inertia::location($result['url']);
                 }
             } else {
                 $result = $this->zibal->request(
@@ -148,7 +149,7 @@ class PaymentController extends Controller
                         'amount' => $amount,
                         'status' => 'initiated',
                     ]);
-                    return redirect()->away($result['url']);
+                    return Inertia::location($result['url']);
                 }
             }
 
