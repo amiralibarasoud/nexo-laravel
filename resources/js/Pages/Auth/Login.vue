@@ -5,11 +5,26 @@
       <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
         <!-- Header -->
         <div class="bg-gradient-to-br from-primary-700 to-primary-900 p-8 text-center">
-          <Link :href="route('home')" class="inline-flex items-center gap-2 mb-6 group">
-            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-              <span class="text-white font-black text-xl">N</span>
+          <Link :href="route('home')" class="inline-flex items-center justify-center mb-6 group">
+            <div
+              v-if="footer.logo"
+              class="bg-white rounded-lg px-3 py-2 shrink-0"
+            >
+              <img
+                :src="footer.logo"
+                :alt="footer.site_name"
+                class="h-10 w-auto max-w-[160px] object-contain"
+              />
             </div>
-            <span class="text-white text-xl font-bold">نکسو کورس</span>
+            <div
+              v-else
+              class="inline-flex items-center gap-2"
+            >
+              <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                <span class="text-white font-black text-xl">{{ footer.logo_letter || 'N' }}</span>
+              </div>
+              <span class="text-white text-xl font-bold">{{ footer.site_name || 'نکسووست' }}</span>
+            </div>
           </Link>
           <h1 class="text-2xl font-black text-white">ورود / ثبت‌نام</h1>
           <p class="text-primary-200 text-sm mt-2">با شماره موبایل وارد شو</p>
@@ -119,17 +134,19 @@
       </div>
 
       <p class="text-center text-gray-400 text-sm mt-6">
-        با ورود، <a href="#" class="text-primary-600 hover:underline">قوانین و مقررات</a> را می‌پذیرید.
+        با ورود، <Link :href="route('terms')" class="text-primary-600 hover:underline">قوانین و مقررات</Link> را می‌پذیرید.
       </p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, nextTick, onUnmounted } from 'vue';
-import { router } from '@inertiajs/vue3';
-import { Link } from '@inertiajs/vue3';
+import { ref, computed, nextTick, onUnmounted } from 'vue';
+import { router, Link, usePage } from '@inertiajs/vue3';
 import axios from 'axios';
+
+const page = usePage();
+const footer = computed(() => page.props.theme?.footer ?? {});
 
 const step = ref('mobile');
 const mobile = ref('');
