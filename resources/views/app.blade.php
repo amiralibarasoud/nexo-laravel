@@ -7,13 +7,13 @@
 
     <!-- SEO Base -->
     <meta name="robots" content="index, follow">
-    <meta name="author" content="نکسو کورس">
+    <meta name="author" content="نکسووست">
     <link rel="canonical" href="{{ url()->current() }}">
 
     <title inertia>{{ config('app.name') }}</title>
 
     <!-- Open Graph defaults (overridden per page via <Head>) -->
-    <meta property="og:site_name" content="نکسو کورس">
+    <meta property="og:site_name" content="نکسووست">
     <meta property="og:locale" content="fa_IR">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
