@@ -4,12 +4,16 @@
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div class="md:col-span-2">
           <div class="flex items-center gap-2 mb-4">
-            <img
+            <div
               v-if="footer.logo"
-              :src="footer.logo"
-              :alt="footer.site_name"
-              class="h-9 w-auto max-w-[140px] object-contain"
-            />
+              class="bg-white rounded-lg px-2.5 py-1.5 shrink-0"
+            >
+              <img
+                :src="footer.logo"
+                :alt="footer.site_name"
+                class="h-9 w-auto max-w-[140px] object-contain"
+              />
+            </div>
             <div
               v-else
               class="w-9 h-9 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center"
@@ -39,6 +43,10 @@
           <ul class="space-y-2 text-sm text-gray-400">
             <li v-if="footer.email">{{ footer.email }}</li>
             <li v-if="footer.phone">{{ footer.phone }}</li>
+            <li v-if="footer.address" class="leading-relaxed">
+              <span class="text-gray-500">آدرس:</span>
+              {{ footer.address }}
+            </li>
             <li v-if="footer.show_contact_link">
               <Link :href="route('contact')" class="hover:text-white transition-colors">
                 {{ footer.contact_link_text || 'فرم تماس' }}

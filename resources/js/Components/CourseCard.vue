@@ -37,11 +37,6 @@
 
     <!-- Card Body -->
     <div class="p-5">
-      <!-- Category -->
-      <div v-if="course.category" class="mb-2">
-        <span class="text-primary-600 text-xs font-semibold">{{ course.category.name }}</span>
-      </div>
-
       <!-- Title -->
       <h3 class="font-bold text-gray-900 text-base mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors leading-relaxed">
         {{ course.title }}
