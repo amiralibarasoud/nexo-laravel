@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Models\Setting;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -30,7 +31,9 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->brandName('نکسو کورس')
+            ->brandName('')
+            ->brandLogo(fn (): string => Setting::footerConfig()['logo'] ?: asset('favicon.ico'))
+            ->brandLogoHeight('2.5rem')
             ->favicon(asset('favicon.ico'))
             ->colors([
                 'primary' => Color::Blue,
@@ -68,6 +71,13 @@ class AdminPanelProvider extends PanelProvider
                     .fi-breadcrumbs ol { flex-direction: row-reverse; }
                     /* header actions */
                     .fi-header-actions { flex-direction: row-reverse; }
+
+                    /* استایل لوگوی بالای فرم ورود (هماهنگ با فوتر سایت) */
+                    .fi-simple-header .fi-logo {
+                        background-color: #fff;
+                        border-radius: 0.5rem;
+                        padding: 0.375rem 0.625rem;
+                    }
                 </style>')
             )
             ->navigationGroups([
