@@ -86,7 +86,10 @@
           </div>
           <div v-else>
             <span v-if="course.price === 0" class="text-xl font-bold text-green-600">رایگان</span>
-            <span v-else class="text-xl font-bold text-gray-900">{{ formatPrice(course.price) }}</span>
+            <span v-else class="text-xl font-bold text-gray-900">
+              <span v-if="course.has_variable_pricing" class="text-sm font-medium text-gray-500 ml-1">از</span>
+              {{ formatPrice(course.price) }}
+            </span>
           </div>
         </div>
         <span class="badge bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-lg">{{ course.level_label }}</span>

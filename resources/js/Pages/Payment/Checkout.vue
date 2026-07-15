@@ -29,17 +29,35 @@
               <label v-if="course.has_text" class="flex items-start gap-3 p-3 border-2 rounded-xl cursor-pointer transition-all"
                      :class="form.content_type === 'text' ? 'border-primary-500 bg-primary-50' : 'border-gray-200 hover:border-gray-300'">
                 <input type="radio" value="text" v-model="form.content_type" class="mt-0.5 text-primary-600" />
-                <div><div class="font-semibold text-gray-800 text-sm">📄 فقط متنی</div></div>
+                <div class="flex-1 flex items-center justify-between gap-3">
+                  <div class="font-semibold text-gray-800 text-sm">📄 فقط متنی</div>
+                  <div class="text-left">
+                    <span class="font-bold text-primary-700 text-sm">{{ formatPrice(priceForType('text').effective_price) }}</span>
+                    <span v-if="priceForType('text').is_discounted" class="block text-xs text-gray-400 line-through">{{ formatPrice(priceForType('text').price) }}</span>
+                  </div>
+                </div>
               </label>
               <label v-if="course.has_audio" class="flex items-start gap-3 p-3 border-2 rounded-xl cursor-pointer transition-all"
                      :class="form.content_type === 'audio' ? 'border-primary-500 bg-primary-50' : 'border-gray-200 hover:border-gray-300'">
                 <input type="radio" value="audio" v-model="form.content_type" class="mt-0.5 text-primary-600" />
-                <div><div class="font-semibold text-gray-800 text-sm">🎧 فقط صوتی</div></div>
+                <div class="flex-1 flex items-center justify-between gap-3">
+                  <div class="font-semibold text-gray-800 text-sm">🎧 فقط صوتی</div>
+                  <div class="text-left">
+                    <span class="font-bold text-primary-700 text-sm">{{ formatPrice(priceForType('audio').effective_price) }}</span>
+                    <span v-if="priceForType('audio').is_discounted" class="block text-xs text-gray-400 line-through">{{ formatPrice(priceForType('audio').price) }}</span>
+                  </div>
+                </div>
               </label>
               <label v-if="course.has_text && course.has_audio" class="flex items-start gap-3 p-3 border-2 rounded-xl cursor-pointer transition-all"
                      :class="form.content_type === 'both' ? 'border-primary-500 bg-primary-50' : 'border-gray-200 hover:border-gray-300'">
                 <input type="radio" value="both" v-model="form.content_type" class="mt-0.5 text-primary-600" />
-                <div><div class="font-semibold text-gray-800 text-sm">📄🎧 هر دو</div></div>
+                <div class="flex-1 flex items-center justify-between gap-3">
+                  <div class="font-semibold text-gray-800 text-sm">📄🎧 هر دو</div>
+                  <div class="text-left">
+                    <span class="font-bold text-primary-700 text-sm">{{ formatPrice(priceForType('both').effective_price) }}</span>
+                    <span v-if="priceForType('both').is_discounted" class="block text-xs text-gray-400 line-through">{{ formatPrice(priceForType('both').price) }}</span>
+                  </div>
+                </div>
               </label>
             </div>
           </div>
@@ -94,11 +112,11 @@
           <div class="bg-gray-50 rounded-xl p-4 space-y-2 text-sm">
             <div class="flex justify-between text-gray-600">
               <span>قیمت دوره</span>
-              <span>{{ formatPrice(course.price) }}</span>
+              <span>{{ formatPrice(selectedPricing.price) }}</span>
             </div>
-            <div v-if="course.is_discounted" class="flex justify-between text-orange-500">
+            <div v-if="selectedPricing.is_discounted" class="flex justify-between text-orange-500">
               <span>تخفیف دوره</span>
-              <span>- {{ formatPrice(course.price - course.effective_price) }}</span>
+              <span>- {{ formatPrice(selectedPricing.price - selectedPricing.effective_price) }}</span>
             </div>
             <div v-if="appliedCoupon" class="flex justify-between text-green-600 font-semibold">
               <span>کد تخفیف ({{ appliedCoupon.code }})</span>
@@ -170,7 +188,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed } from 'vue';
+import { reactive, ref, computed, watch } from 'vue';
 import axios from 'axios';
 import MainLayout from '@/Layouts/MainLayout.vue';
 
@@ -194,11 +212,27 @@ const form = reactive({
   coupon_code: '',
 });
 
+const selectedPricing = computed(() => {
+  return props.course.content_type_prices?.[form.content_type] ?? {
+    price: props.course.price,
+    effective_price: props.course.effective_price,
+    is_discounted: props.course.is_discounted,
+  };
+});
+
 const finalAmount = computed(() => {
-  const base = props.course.effective_price;
+  const base = selectedPricing.value.effective_price;
   if (appliedCoupon.value) return base - appliedCoupon.value.discount;
   return base;
 });
+
+function priceForType(type) {
+  return props.course.content_type_prices?.[type] ?? {
+    price: props.course.price,
+    effective_price: props.course.effective_price,
+    is_discounted: props.course.is_discounted,
+  };
+}
 
 function formatPrice(amount) {
   return Number(amount).toLocaleString('fa-IR') + ' تومان';
@@ -214,7 +248,7 @@ async function applyCoupon() {
     const res = await axios.post(route('coupon.validate'), {
       code:      couponInput.value.toUpperCase(),
       course_id: props.course.id,
-      amount:    props.course.effective_price,
+      amount:    selectedPricing.value.effective_price,
     });
     appliedCoupon.value = res.data;
     form.coupon_code    = couponInput.value.toUpperCase();
@@ -232,6 +266,12 @@ function removeCoupon() {
   couponInput.value   = '';
   form.coupon_code    = '';
 }
+
+watch(() => form.content_type, () => {
+  if (appliedCoupon.value) {
+    removeCoupon();
+  }
+});
 
 function submitPayment() {
   if (loading.value || !form.gateway) return;

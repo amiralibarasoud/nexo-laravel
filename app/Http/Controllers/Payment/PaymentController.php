@@ -49,10 +49,12 @@ class PaymentController extends Controller
                 'title' => $course->title,
                 'slug' => $course->slug,
                 'cover_image' => $course->cover_image,
-                'price' => $course->price,
+                'price' => $course->starting_price,
                 'discounted_price' => $course->discounted_price,
-                'effective_price' => $course->effective_price,
+                'effective_price' => $course->starting_effective_price,
                 'is_discounted' => $course->is_discounted,
+                'has_variable_pricing' => $course->has_variable_pricing,
+                'content_type_prices' => $course->getContentTypePrices(),
                 'has_text' => $course->has_text,
                 'has_audio' => $course->has_audio,
             ],
@@ -85,7 +87,11 @@ class PaymentController extends Controller
             return redirect()->route('courses.learn', $course->slug);
         }
 
-        $originalAmount = $course->effective_price;
+        if (!$course->isContentTypeAvailable($request->content_type)) {
+            return redirect()->back()->with('error', 'نوع محتوای انتخاب‌شده برای این دوره معتبر نیست.');
+        }
+
+        $originalAmount = $course->getEffectivePriceForContentType($request->content_type);
         $amount         = $originalAmount;
         $discountAmount = 0;
         $coupon         = null;

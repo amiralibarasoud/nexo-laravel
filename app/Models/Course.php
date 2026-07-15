@@ -23,6 +23,9 @@ class Course extends Model
         'instructor_avatar',
         'instructor_bio',
         'price',
+        'price_text',
+        'price_audio',
+        'price_both',
         'discounted_price',
         'discount_expires_at',
         'has_text',
@@ -78,10 +81,114 @@ class Course extends Model
 
     public function getEffectivePriceAttribute(): int
     {
-        if ($this->discounted_price && $this->discount_expires_at && $this->discount_expires_at->isFuture()) {
-            return $this->discounted_price;
+        return $this->getStartingEffectivePrice();
+    }
+
+    public function getBasePriceForContentType(string $contentType): int
+    {
+        return match ($contentType) {
+            'text' => (int) ($this->price_text ?? $this->price),
+            'audio' => (int) ($this->price_audio ?? $this->price),
+            'both' => (int) ($this->price_both ?? $this->price),
+            default => (int) $this->price,
+        };
+    }
+
+    public function getEffectivePriceForContentType(string $contentType): int
+    {
+        $basePrice = $this->getBasePriceForContentType($contentType);
+
+        if ($this->is_discounted && $this->price > 0) {
+            $ratio = $this->discounted_price / $this->price;
+
+            return (int) max(0, round($basePrice * $ratio));
         }
-        return $this->price;
+
+        return $basePrice;
+    }
+
+    public function getAvailableContentTypes(): array
+    {
+        $types = [];
+
+        if ($this->has_text) {
+            $types[] = 'text';
+        }
+
+        if ($this->has_audio) {
+            $types[] = 'audio';
+        }
+
+        if ($this->has_text && $this->has_audio) {
+            $types[] = 'both';
+        }
+
+        return $types;
+    }
+
+    public function isContentTypeAvailable(string $contentType): bool
+    {
+        return in_array($contentType, $this->getAvailableContentTypes(), true);
+    }
+
+    public function getContentTypePrices(): array
+    {
+        $prices = [];
+
+        foreach ($this->getAvailableContentTypes() as $type) {
+            $basePrice = $this->getBasePriceForContentType($type);
+            $effectivePrice = $this->getEffectivePriceForContentType($type);
+
+            $prices[$type] = [
+                'price' => $basePrice,
+                'effective_price' => $effectivePrice,
+                'is_discounted' => $this->is_discounted && $basePrice > $effectivePrice,
+            ];
+        }
+
+        return $prices;
+    }
+
+    public function getStartingPriceAttribute(): int
+    {
+        $prices = array_map(
+            fn (string $type) => $this->getBasePriceForContentType($type),
+            $this->getAvailableContentTypes()
+        );
+
+        if (empty($prices)) {
+            return (int) $this->price;
+        }
+
+        return min($prices);
+    }
+
+    public function getStartingEffectivePrice(): int
+    {
+        $prices = array_map(
+            fn (string $type) => $this->getEffectivePriceForContentType($type),
+            $this->getAvailableContentTypes()
+        );
+
+        if (empty($prices)) {
+            return $this->is_discounted ? (int) $this->discounted_price : (int) $this->price;
+        }
+
+        return min($prices);
+    }
+
+    public function getHasVariablePricingAttribute(): bool
+    {
+        $prices = array_map(
+            fn (string $type) => $this->getBasePriceForContentType($type),
+            $this->getAvailableContentTypes()
+        );
+
+        if (count($prices) <= 1) {
+            return false;
+        }
+
+        return count(array_unique($prices)) > 1;
     }
 
     public function getIsDiscountedAttribute(): bool
@@ -93,10 +200,11 @@ class Course extends Model
 
     public function getDiscountPercentAttribute(): int
     {
-        if (!$this->is_discounted || $this->price == 0) {
+        if (!$this->is_discounted || $this->starting_price == 0) {
             return 0;
         }
-        return (int) round(100 - ($this->discounted_price / $this->price * 100));
+
+        return (int) round(100 - ($this->starting_effective_price / $this->starting_price * 100));
     }
 
     public function getLevelLabelAttribute(): string

@@ -8,7 +8,14 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditCourse extends EditRecord
 {
+    use SyncsCourseReferencePrice;
+
     protected static string $resource = CourseResource::class;
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        return $this->syncCourseReferencePrice($data);
+    }
 
     protected function getHeaderActions(): array
     {

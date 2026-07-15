@@ -140,8 +140,14 @@
               </div>
               <div v-else>
                 <span v-if="course.price === 0" class="text-3xl font-black text-green-600">رایگان</span>
-                <span v-else class="text-3xl font-black text-gray-900">{{ formatPrice(course.price) }}</span>
+                <span v-else class="text-3xl font-black text-gray-900">
+                  <span v-if="course.has_variable_pricing" class="text-lg font-semibold text-gray-500 ml-1">از</span>
+                  {{ formatPrice(course.price) }}
+                </span>
               </div>
+              <p v-if="course.has_variable_pricing && course.has_text && course.has_audio" class="text-xs text-gray-500 mt-2">
+                قیمت نهایی بر اساس نوع محتوای انتخابی (متنی، صوتی یا هر دو) در صفحه پرداخت مشخص می‌شود.
+              </p>
             </div>
 
             <!-- CTA -->
