@@ -13,9 +13,9 @@ if (!function_exists('toFarsiNumber')) {
 }
 
 if (!function_exists('price')) {
-    function price(int|float $amount, bool $showUnit = true): string
+    function price(int|float|null $amount, bool $showUnit = true): string
     {
-        $formatted = number_format($amount, 0, '.', '٬');
+        $formatted = number_format((float) ($amount ?? 0), 0, '.', '٬');
         $farsi = toFarsiNumber($formatted);
         return $showUnit ? $farsi . ' تومان' : $farsi;
     }

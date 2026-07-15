@@ -77,39 +77,54 @@ class CourseResource extends Resource
                                 Forms\Components\TextInput::make('price_text')
                                     ->label('قیمت محتوای متنی (تومان)')
                                     ->numeric()
+                                    ->integer()
                                     ->minValue(0)
                                     ->default(0)
+                                    ->nullable()
                                     ->suffix('تومان')
                                     ->visible(fn (Forms\Get $get): bool => (bool) $get('has_text'))
-                                    ->required(fn (Forms\Get $get): bool => (bool) $get('has_text')),
+                                    ->required(fn (Forms\Get $get): bool => (bool) $get('has_text'))
+                                    ->dehydrated(),
                                 Forms\Components\TextInput::make('price_audio')
                                     ->label('قیمت محتوای صوتی (تومان)')
                                     ->numeric()
+                                    ->integer()
                                     ->minValue(0)
                                     ->default(0)
+                                    ->nullable()
                                     ->suffix('تومان')
                                     ->visible(fn (Forms\Get $get): bool => (bool) $get('has_audio'))
-                                    ->required(fn (Forms\Get $get): bool => (bool) $get('has_audio')),
+                                    ->required(fn (Forms\Get $get): bool => (bool) $get('has_audio'))
+                                    ->dehydrated(),
                                 Forms\Components\TextInput::make('price_both')
                                     ->label('قیمت هر دو (متن + صوت) (تومان)')
                                     ->numeric()
+                                    ->integer()
                                     ->minValue(0)
                                     ->default(0)
+                                    ->nullable()
                                     ->suffix('تومان')
                                     ->visible(fn (Forms\Get $get): bool => (bool) $get('has_text') && (bool) $get('has_audio'))
-                                    ->required(fn (Forms\Get $get): bool => (bool) $get('has_text') && (bool) $get('has_audio')),
+                                    ->required(fn (Forms\Get $get): bool => (bool) $get('has_text') && (bool) $get('has_audio'))
+                                    ->dehydrated(),
                             ]),
                         ]),
                     Forms\Components\Section::make('تخفیف دوره')
-                        ->description('تخفیف به‌صورت درصدی روی همه قیمت‌ها اعمال می‌شود.')
+                        ->description('قیمت با تخفیف را نسبت به کمترین قیمت محتوا وارد کنید؛ نسبت تخفیف روی همه نوع‌های محتوا اعمال می‌شود.')
                         ->schema([
                             Forms\Components\Grid::make(2)->schema([
                                 Forms\Components\TextInput::make('discounted_price')
-                                    ->label('قیمت با تخفیف (تومان)')->numeric()->nullable()->suffix('تومان'),
+                                    ->label('کمترین قیمت با تخفیف (تومان)')
+                                    ->numeric()
+                                    ->integer()
+                                    ->minValue(0)
+                                    ->nullable()
+                                    ->suffix('تومان')
+                                    ->dehydrateStateUsing(fn ($state) => ($state === '' || $state === null) ? null : (int) $state),
                                 jalaliDatePicker('discount_expires_at', 'انقضای تخفیف'),
                             ]),
                         ]),
-                    Forms\Components\Hidden::make('price')->default(0),
+                    Forms\Components\Hidden::make('price')->default(0)->dehydrated(),
                 ]),
 
                 Forms\Components\Tabs\Tab::make('تنظیمات')->schema([
@@ -135,7 +150,14 @@ class CourseResource extends Resource
                 Tables\Columns\ImageColumn::make('cover_image')->label('تصویر')->disk('public')->size(56)->defaultImageUrl(asset('images/placeholder.png')),
                 Tables\Columns\TextColumn::make('title')->label('عنوان')->searchable()->sortable()->limit(35)->weight('bold'),
                 Tables\Columns\TextColumn::make('category.name')->label('دسته')->badge()->color('primary'),
-                Tables\Columns\TextColumn::make('starting_price')->label('از قیمت')->formatStateUsing(fn ($state, Course $record) => $record->has_variable_pricing ? 'از ' . price($state) : price($state))->sortable(query: fn ($query, $direction) => $query->orderBy('price', $direction)),
+                Tables\Columns\TextColumn::make('starting_price')
+                    ->label('از قیمت')
+                    ->formatStateUsing(function ($state, Course $record) {
+                        $amount = (int) ($state ?? $record->price ?? 0);
+
+                        return $record->has_variable_pricing ? 'از ' . price($amount) : price($amount);
+                    })
+                    ->sortable(query: fn ($query, $direction) => $query->orderBy('price', $direction)),
                 Tables\Columns\TextColumn::make('students_count')->label('دانش‌آموز')->formatStateUsing(fn($state) => toFarsiNumber($state))->sortable(),
                 Tables\Columns\IconColumn::make('has_text')->label('متن')->boolean(),
                 Tables\Columns\IconColumn::make('has_audio')->label('صوت')->boolean(),
