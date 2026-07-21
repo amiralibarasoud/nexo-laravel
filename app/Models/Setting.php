@@ -241,6 +241,8 @@ class Setting extends Model
             ['key' => 'footer_address', 'value' => 'قم ـ بلوار جمهوری اسلامی ـ کوچه ۳۶ ـ ساختمان آسیا ـ طبقه دوم', 'group' => 'theme'],
             ['key' => 'footer_show_contact_link', 'value' => '1', 'group' => 'theme'],
             ['key' => 'footer_contact_link_text', 'value' => 'فرم تماس', 'group' => 'theme'],
+            ['key' => 'footer_enamad_enabled', 'value' => '1', 'group' => 'theme'],
+            ['key' => 'footer_enamad_html', 'value' => '', 'group' => 'theme'],
             ['key' => 'footer_copyright', 'value' => 'تمامی حقوق برای نکسو کورس محفوظ است © {year}', 'group' => 'theme'],
             ...static::pageThemeSeedDefaults(),
         ];
@@ -427,6 +429,8 @@ class Setting extends Model
             'address'            => static::get('footer_address', 'قم ـ بلوار جمهوری اسلامی ـ کوچه ۳۶ ـ ساختمان آسیا ـ طبقه دوم'),
             'show_contact_link'  => static::getBool('footer_show_contact_link', true),
             'contact_link_text'  => static::get('footer_contact_link_text', 'فرم تماس'),
+            'enamad_enabled'     => static::getBool('footer_enamad_enabled', true),
+            'enamad_html'        => static::get('footer_enamad_html', ''),
             'copyright'          => static::get('footer_copyright', 'تمامی حقوق برای نکسو کورس محفوظ است © {year}'),
         ];
     }

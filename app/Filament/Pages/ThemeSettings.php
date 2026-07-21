@@ -96,6 +96,8 @@ class ThemeSettings extends Page implements HasForms
             'footer_address'               => Setting::get('footer_address', 'قم ـ بلوار جمهوری اسلامی ـ کوچه ۳۶ ـ ساختمان آسیا ـ طبقه دوم'),
             'footer_show_contact_link'     => Setting::getBool('footer_show_contact_link', true),
             'footer_contact_link_text'     => Setting::get('footer_contact_link_text', 'فرم تماس'),
+            'footer_enamad_enabled'        => Setting::getBool('footer_enamad_enabled', true),
+            'footer_enamad_html'           => Setting::get('footer_enamad_html', ''),
             'footer_copyright'             => Setting::get('footer_copyright', 'تمامی حقوق برای نکسووست محفوظ است © {year}'),
             'contact_seo_title'            => Setting::get('contact_seo_title', 'تماس با ما'),
             'contact_page_title'           => Setting::get('contact_page_title', 'تماس با ما'),
@@ -301,6 +303,12 @@ class ThemeSettings extends Page implements HasForms
                 Toggle::make('footer_show_contact_link')->label('نمایش لینک فرم تماس'),
                 TextInput::make('footer_contact_link_text')->label('متن لینک تماس')->maxLength(50),
             ]),
+            Section::make('نماد اعتماد (اینماد)')->icon('heroicon-o-shield-check')->schema([
+                Toggle::make('footer_enamad_enabled')->label('نمایش نماد اعتماد')->default(true),
+                Textarea::make('footer_enamad_html')->label('کد HTML اینماد')
+                    ->helperText('کد دریافتی از enamad.ir را اینجا قرار دهید. زیر بخش «تماس با ما» در فوتر نمایش داده می‌شود.')
+                    ->rows(6)->columnSpanFull(),
+            ]),
             Section::make('کپی‌رایت')->schema([
                 TextInput::make('footer_copyright')->label('متن پایین فوتر')
                     ->helperText('از {year} برای سال جلالی استفاده کنید.')
@@ -480,6 +488,8 @@ class ThemeSettings extends Page implements HasForms
             'footer_address'               => $data['footer_address'] ?? '',
             'footer_show_contact_link'     => ($data['footer_show_contact_link'] ?? true) ? '1' : '0',
             'footer_contact_link_text'     => $data['footer_contact_link_text'] ?? '',
+            'footer_enamad_enabled'        => ($data['footer_enamad_enabled'] ?? true) ? '1' : '0',
+            'footer_enamad_html'           => $data['footer_enamad_html'] ?? '',
             'footer_copyright'             => $data['footer_copyright'] ?? '',
             'contact_seo_title'            => $data['contact_seo_title'] ?? 'تماس با ما',
             'contact_page_title'           => $data['contact_page_title'] ?? 'تماس با ما',

@@ -53,6 +53,13 @@
               </Link>
             </li>
           </ul>
+
+          <div
+            v-if="showEnamad"
+            class="mt-6 pt-4 border-t border-gray-800"
+          >
+            <div class="enamad-badge inline-block" v-html="footer.enamad_html" />
+          </div>
         </div>
       </div>
 
@@ -73,6 +80,10 @@ const footer = computed(() => page.props.theme?.footer ?? {});
 
 const visibleLinks = computed(() =>
   (footer.value.links ?? []).filter((item) => item.visible !== false)
+);
+
+const showEnamad = computed(() =>
+  footer.value.enamad_enabled !== false && (footer.value.enamad_html ?? '').trim() !== ''
 );
 
 const copyrightText = computed(() => {
