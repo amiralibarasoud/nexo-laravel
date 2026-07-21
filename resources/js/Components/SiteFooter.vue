@@ -53,15 +53,26 @@
               </Link>
             </li>
           </ul>
-        </div>
-      </div>
 
-      <div
-        v-if="showEnamad"
-        class="mt-8 pt-6 border-t border-gray-800 flex justify-center"
-      >
-        <div class="bg-white rounded-xl px-4 py-3 shadow-md">
-          <FooterTrustSeal :html="footer.enamad_html" />
+          <div class="mt-6">
+            <div class="bg-white rounded-xl px-3 py-2.5 shadow-md inline-flex items-center justify-center">
+              <a
+                referrerpolicy="origin"
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://trustseal.enamad.ir/?id=6394905&Code=hcKPUvpSgtS3vgs6OG5gN6pjGcliJOAm"
+                class="inline-block leading-none"
+              >
+                <img
+                  referrerpolicy="origin"
+                  src="https://trustseal.enamad.ir/logo.aspx?id=6394905&Code=hcKPUvpSgtS3vgs6OG5gN6pjGcliJOAm"
+                  alt="نماد اعتماد الکترونیکی"
+                  class="h-[88px] w-auto cursor-pointer block"
+                  code="hcKPUvpSgtS3vgs6OG5gN6pjGcliJOAm"
+                />
+              </a>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -76,7 +87,6 @@
 import { computed } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import { jalaliYear } from '@/Composables/useJalali';
-import FooterTrustSeal from '@/Components/FooterTrustSeal.vue';
 
 const page = usePage();
 const footer = computed(() => page.props.theme?.footer ?? {});
@@ -84,20 +94,6 @@ const footer = computed(() => page.props.theme?.footer ?? {});
 const visibleLinks = computed(() =>
   (footer.value.links ?? []).filter((item) => item.visible !== false)
 );
-
-const showEnamad = computed(() => {
-  const html = (footer.value.enamad_html ?? '').trim();
-  if (!html) {
-    return false;
-  }
-
-  const enabled = footer.value.enamad_enabled;
-  if (enabled === false || enabled === 0 || enabled === '0') {
-    return false;
-  }
-
-  return true;
-});
 
 const copyrightText = computed(() => {
   const template = footer.value.copyright || 'تمامی حقوق محفوظ است © {year}';
