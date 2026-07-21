@@ -253,6 +253,18 @@ class Setting extends Model
         return $path ? Storage::disk('public')->url($path) : null;
     }
 
+    protected static function trustSealHtml(string $key): string
+    {
+        $html = (string) static::get($key, '');
+        $html = html_entity_decode($html, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        if (str_contains($html, '&lt;') || str_contains($html, '&gt;')) {
+            $html = html_entity_decode($html, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        }
+
+        return trim($html);
+    }
+
     public static function defaultNavLinks(): array
     {
         return [
@@ -430,7 +442,7 @@ class Setting extends Model
             'show_contact_link'  => static::getBool('footer_show_contact_link', true),
             'contact_link_text'  => static::get('footer_contact_link_text', 'فرم تماس'),
             'enamad_enabled'     => static::getBool('footer_enamad_enabled', true),
-            'enamad_html'        => static::get('footer_enamad_html', ''),
+            'enamad_html'        => static::trustSealHtml('footer_enamad_html'),
             'copyright'          => static::get('footer_copyright', 'تمامی حقوق برای نکسو کورس محفوظ است © {year}'),
         ];
     }

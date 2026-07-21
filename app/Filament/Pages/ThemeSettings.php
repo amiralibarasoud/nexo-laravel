@@ -306,8 +306,9 @@ class ThemeSettings extends Page implements HasForms
             Section::make('نماد اعتماد (اینماد)')->icon('heroicon-o-shield-check')->schema([
                 Toggle::make('footer_enamad_enabled')->label('نمایش نماد اعتماد')->default(true),
                 Textarea::make('footer_enamad_html')->label('کد HTML اینماد')
-                    ->helperText('کد دریافتی از enamad.ir را اینجا قرار دهید. زیر بخش «تماس با ما» در فوتر نمایش داده می‌شود.')
-                    ->rows(6)->columnSpanFull(),
+                    ->helperText('کد دریافتی از enamad.ir (تگ a/img یا script) را اینجا قرار دهید. زیر بخش تماس در فوتر با پس‌زمینه سفید نمایش داده می‌شود.')
+                    ->rows(6)->columnSpanFull()
+                    ->extraInputAttributes(['dir' => 'ltr', 'class' => 'font-mono text-sm']),
             ]),
             Section::make('کپی‌رایت')->schema([
                 TextInput::make('footer_copyright')->label('متن پایین فوتر')

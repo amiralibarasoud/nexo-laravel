@@ -53,13 +53,15 @@
               </Link>
             </li>
           </ul>
+        </div>
+      </div>
 
-          <div
-            v-if="showEnamad"
-            class="mt-6 pt-4 border-t border-gray-800"
-          >
-            <div class="enamad-badge inline-block" v-html="footer.enamad_html" />
-          </div>
+      <div
+        v-if="showEnamad"
+        class="mt-8 pt-6 border-t border-gray-800 flex justify-center"
+      >
+        <div class="bg-white rounded-xl px-4 py-3 shadow-md">
+          <FooterTrustSeal :html="footer.enamad_html" />
         </div>
       </div>
 
@@ -74,6 +76,7 @@
 import { computed } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import { jalaliYear } from '@/Composables/useJalali';
+import FooterTrustSeal from '@/Components/FooterTrustSeal.vue';
 
 const page = usePage();
 const footer = computed(() => page.props.theme?.footer ?? {});
@@ -82,9 +85,19 @@ const visibleLinks = computed(() =>
   (footer.value.links ?? []).filter((item) => item.visible !== false)
 );
 
-const showEnamad = computed(() =>
-  footer.value.enamad_enabled !== false && (footer.value.enamad_html ?? '').trim() !== ''
-);
+const showEnamad = computed(() => {
+  const html = (footer.value.enamad_html ?? '').trim();
+  if (!html) {
+    return false;
+  }
+
+  const enabled = footer.value.enamad_enabled;
+  if (enabled === false || enabled === 0 || enabled === '0') {
+    return false;
+  }
+
+  return true;
+});
 
 const copyrightText = computed(() => {
   const template = footer.value.copyright || 'تمامی حقوق محفوظ است © {year}';
