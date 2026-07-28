@@ -1,16 +1,16 @@
 <template>
   <MainLayout>
-    <Head :title="pageFaq.seo_title || 'سوالات متداول'">
-      <meta v-if="pageFaq.subtitle" name="description" :content="pageFaq.subtitle">
+    <Head :title="faq.seo_title || 'سوالات متداول'">
+      <meta v-if="faq.subtitle" name="description" :content="faq.subtitle">
     </Head>
 
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <div class="text-center mb-10">
         <h1 class="text-3xl sm:text-4xl font-black text-gray-900 mb-3">
-          {{ pageFaq.title || 'سوالات متداول' }}
+          {{ faq.title || 'سوالات متداول' }}
         </h1>
-        <p v-if="pageFaq.subtitle" class="text-gray-500 leading-relaxed">
-          {{ pageFaq.subtitle }}
+        <p v-if="faq.subtitle" class="text-gray-500 leading-relaxed">
+          {{ faq.subtitle }}
         </p>
       </div>
 
@@ -38,7 +38,7 @@
           </button>
           <div
             v-show="openIndex === index"
-            class="px-5 pb-5 text-gray-600 text-sm leading-loose border-t border-gray-50 pt-4 whitespace-pre-line"
+            class="px-5 pb-5 text-gray-600 text-sm leading-loose border-t border-gray-50 pt-4"
           >
             {{ item.answer }}
           </div>
@@ -57,27 +57,10 @@ import { computed, ref } from 'vue';
 import { Head, usePage } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
 
-const props = defineProps({
-  faq: {
-    type: Object,
-    default: () => ({}),
-  },
-});
-
 const page = usePage();
-const pageFaq = computed(() => ({
-  ...(page.props.theme?.faq ?? {}),
-  ...(props.faq ?? {}),
-}));
-
-const items = computed(() => {
-  const raw = pageFaq.value.items;
-  const list = Array.isArray(raw) ? raw : Object.values(raw ?? {});
-
-  return list.filter((item) => item && String(item.question ?? '').trim());
-});
-
-const openIndex = ref(items.value.length ? 0 : -1);
+const faq = computed(() => page.props.theme?.faq ?? {});
+const items = computed(() => (faq.value.items ?? []).filter((item) => item.question));
+const openIndex = ref(0);
 
 function toggle(index) {
   openIndex.value = openIndex.value === index ? -1 : index;

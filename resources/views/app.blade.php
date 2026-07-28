@@ -29,6 +29,11 @@
     @routes
     @vite(['resources/js/app.js'])
     @inertiaHead
+
+    <!-- Goftino live chat -->
+    <script type="text/javascript">
+        !function(){var i="AJiEtE",d=document,g=d.createElement("script"),s="https://www.goftino.com/widget/"+i,l=localStorage.getItem("goftino_"+i);g.type="text/javascript",g.async=!0,g.src=l?s+"?o="+l:s;d.getElementsByTagName("head")[0].appendChild(g);}();
+    </script>
 </head>
 <body class="font-vazir antialiased bg-gray-50">
     @inertia
