@@ -116,7 +116,11 @@ body{font-family:Tahoma,sans-serif;max-width:900px;margin:30px auto;padding:20px
 h1,h2{color:#0f172a} code{background:#e2e8f0;padding:2px 6px;border-radius:4px}
 </style></head><body>';
 echo '<h1>به‌روزرسانی قطعی نکسووست</h1>';
+echo '<p class="info"><b>مسیر واقعی اجرا (Document Root):</b> <code>' . htmlspecialchars($public) . '</code></p>';
 echo '<p class="info">root: <code>' . htmlspecialchars($root) . '</code></p>';
+if (str_contains($public, 'public_html')) {
+    echo '<p class="err"><b>هشدار:</b> این اسکریپت داخل public_html اجرا شده. برای nexovest.ir باید Document Root روی <code>/home/modiryat/nexovest.ir/public</code> باشد.</p>';
+}
 echo '<div class="box"><h2>۱) دانلود بیلد از GitHub</h2>';
 
 // Cleanup previous temp
