@@ -136,9 +136,6 @@ if ($r['code'] === 0 || strpos($r['output'], 'تنظیمات') !== false) {
         $app = require_once $repoPath . '/bootstrap/app.php';
         $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-        use App\Models\Setting;
-        use Illuminate\Support\Facades\Cache;
-
         // Fix brand
         $brandKeys = [
             'site_name'                  => ['نکسووست', 'site'],
@@ -147,12 +144,12 @@ if ($r['code'] === 0 || strpos($r['output'], 'تنظیمات') !== false) {
             'footer_site_name'           => ['نکسووست', 'theme'],
         ];
         foreach ($brandKeys as $key => [$value, $group]) {
-            Setting::updateOrCreate(['key' => $key], ['value' => $value, 'group' => $group]);
-            Cache::forget("setting:{$key}");
+            \App\Models\Setting::updateOrCreate(['key' => $key], ['value' => $value, 'group' => $group]);
+            \Illuminate\Support\Facades\Cache::forget("setting:{$key}");
         }
 
         // Replace نکسو کورس
-        Setting::query()->where('value', 'like', '%نکسو کورس%')->get()->each(function ($s) {
+        \App\Models\Setting::query()->where('value', 'like', '%نکسو کورس%')->get()->each(function ($s) {
             $s->update(['value' => str_replace('نکسو کورس', 'نکسووست', $s->value)]);
         });
 
@@ -163,12 +160,12 @@ if ($r['code'] === 0 || strpos($r['output'], 'تنظیمات') !== false) {
             ['question' => 'دسترسی به دوره‌ها تا کی فعال است؟', 'answer' => 'پس از خرید، دسترسی مادام‌العمر است.'],
             ['question' => 'در صورت مشکل در پرداخت چه کنم؟', 'answer' => 'از صفحه تماس با ما پیام بگذارید.'],
         ], JSON_UNESCAPED_UNICODE);
-        Setting::firstOrCreate(['key' => 'faq_items'], ['value' => $faqItems, 'group' => 'theme']);
-        Setting::firstOrCreate(['key' => 'faq_seo_title'], ['value' => 'سوالات متداول', 'group' => 'theme']);
-        Setting::firstOrCreate(['key' => 'faq_page_title'], ['value' => 'سوالات متداول', 'group' => 'theme']);
-        Setting::firstOrCreate(['key' => 'faq_page_subtitle'], ['value' => '', 'group' => 'theme']);
+        \App\Models\Setting::firstOrCreate(['key' => 'faq_items'], ['value' => $faqItems, 'group' => 'theme']);
+        \App\Models\Setting::firstOrCreate(['key' => 'faq_seo_title'], ['value' => 'سوالات متداول', 'group' => 'theme']);
+        \App\Models\Setting::firstOrCreate(['key' => 'faq_page_title'], ['value' => 'سوالات متداول', 'group' => 'theme']);
+        \App\Models\Setting::firstOrCreate(['key' => 'faq_page_subtitle'], ['value' => '', 'group' => 'theme']);
 
-        Cache::flush();
+        \Illuminate\Support\Facades\Cache::flush();
         $log("اصلاح دیتابیس مستقیم موفق بود ✅");
     } catch (\Throwable $e) {
         $log("خطا در اجرای مستقیم: " . htmlspecialchars($e->getMessage()), 'err');
