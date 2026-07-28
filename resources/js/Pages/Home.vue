@@ -1,5 +1,6 @@
 <template>
   <MainLayout>
+    <Head title="نکسووست" />
     <!-- Hero Section -->
     <section
       v-if="home.hero?.enabled"
@@ -227,7 +228,7 @@
 
 <script setup>
 import { computed } from 'vue';
-import { Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
 import CourseCard from '@/Components/CourseCard.vue';
 

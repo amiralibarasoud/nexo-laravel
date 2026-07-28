@@ -1,12 +1,11 @@
 ---
 deployment:
   tasks:
-    - /bin/bash -c "cd /home/modiryat/repositories/nexo-laravel && php artisan config:clear 2>&1 || true"
-    - /bin/bash -c "cd /home/modiryat/repositories/nexo-laravel && php artisan cache:clear 2>&1 || true"
-    - /bin/bash -c "cd /home/modiryat/repositories/nexo-laravel && php artisan view:clear 2>&1 || true"
-    - /bin/bash -c "cd /home/modiryat/repositories/nexo-laravel && php artisan migrate --force 2>&1 || true"
-    - /bin/bash -c "cd /home/modiryat/repositories/nexo-laravel && php artisan db:seed --class=SettingsSeeder --force 2>&1 || true"
-    - /bin/bash -c "cd /home/modiryat/repositories/nexo-laravel && php artisan db:seed --class=BlogSeeder --force 2>&1 || true"
-    - /bin/bash -c "cd /home/modiryat/repositories/nexo-laravel && php artisan storage:link 2>&1 || true"
-    - /bin/bash -c "cd /home/modiryat/repositories/nexo-laravel && php artisan config:cache 2>&1 || true"
-    - /bin/bash -c "cd /home/modiryat/repositories/nexo-laravel && php artisan route:cache 2>&1 || true"
+    - /bin/bash -c "cd /home/modiryat/nexovest.ir && php artisan config:clear 2>&1 || true"
+    - /bin/bash -c "cd /home/modiryat/nexovest.ir && php artisan cache:clear 2>&1 || true"
+    - /bin/bash -c "cd /home/modiryat/nexovest.ir && php artisan view:clear 2>&1 || true"
+    - /bin/bash -c "cd /home/modiryat/nexovest.ir && php artisan route:clear 2>&1 || true"
+    - /bin/bash -c "cd /home/modiryat/nexovest.ir && rm -f bootstrap/cache/config.php bootstrap/cache/routes-v7.php bootstrap/cache/events.php 2>&1 || true"
+    - /bin/bash -c "cd /home/modiryat/nexovest.ir && php artisan migrate --force 2>&1 || true"
+    - /bin/bash -c "cd /home/modiryat/nexovest.ir && php artisan db:seed --class=SettingsSeeder --force 2>&1 || true"
+    - /bin/bash -c "cd /home/modiryat/nexovest.ir && php artisan storage:link 2>&1 || true"

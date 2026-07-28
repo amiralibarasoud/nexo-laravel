@@ -10,7 +10,7 @@ import { createPinia } from 'pinia';
 const appName = 'نکسووست';
 
 createInertiaApp({
-    title: (title) => title ? `${title} | ${appName}` : appName,
+    title: (title) => (!title || title === appName) ? appName : `${title} | ${appName}`,
     resolve: (name) =>
         resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
     setup({ el, App, props, plugin }) {

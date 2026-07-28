@@ -10,7 +10,7 @@
     <meta name="author" content="نکسووست">
     <link rel="canonical" href="{{ url()->current() }}">
 
-    <title inertia>{{ config('app.name') }}</title>
+    <title inertia>نکسووست</title>
 
     <!-- Open Graph defaults (overridden per page via <Head>) -->
     <meta property="og:site_name" content="نکسووست">
