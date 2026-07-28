@@ -33,6 +33,14 @@ class Setting extends Model
         foreach ($data as $key => $value) {
             static::set($key, $value, $group);
         }
+
+        // Shared-hosting file caches can keep stale setting values; flush after bulk save.
+        static::forgetAllCaches();
+    }
+
+    public static function forgetAllCaches(): void
+    {
+        Cache::flush();
     }
 
     public static function getBool(string $key, bool $default = false): bool
@@ -418,14 +426,14 @@ HTML;
         }
 
         // Replace leftover brand name inside any stored text values.
-        static::query()
-            ->where('value', 'like', '%نکسو کورس%')
-            ->get()
-            ->each(function (self $setting) {
-                $setting->update([
-                    'value' => str_replace('نکسو کورس', 'نکسووست', $setting->value),
-                ]);
-            });
+        // static::query()
+        //     ->where('value', 'like', '%نکسو کورس%')
+        //     ->get()
+        //     ->each(function (self $setting) {
+        //         $setting->update([
+        //             'value' => str_replace('نکسو کورس', 'نکسووست', $setting->value),
+        //         ]);
+        //     });
     }
 
     public static function headerConfig(): array
@@ -581,23 +589,50 @@ HTML;
         ];
     }
 
+    /**
+     * FAQ page content — always from admin settings (no hardcoded body fallback).
+     */
     public static function faqConfig(): array
     {
+        $items = static::getJson('faq_items', []);
+
+        // Normalize repeater rows from Filament.
+        $items = array_values(array_filter(array_map(function ($item) {
+            if (! is_array($item)) {
+                return null;
+            }
+
+            $question = trim((string) ($item['question'] ?? ''));
+            $answer = trim((string) ($item['answer'] ?? ''));
+
+            if ($question === '') {
+                return null;
+            }
+
+            return [
+                'question' => $question,
+                'answer' => $answer,
+            ];
+        }, $items)));
+
         return [
-            'seo_title' => static::get('faq_seo_title', 'سوالات متداول'),
-            'title'     => static::get('faq_page_title', 'سوالات متداول'),
-            'subtitle'  => static::get('faq_page_subtitle', ''),
-            'items'     => static::getJson('faq_items', static::defaultFaqItems()),
+            'seo_title' => (string) (static::get('faq_seo_title') ?: 'سوالات متداول'),
+            'title'     => (string) (static::get('faq_page_title') ?: 'سوالات متداول'),
+            'subtitle'  => (string) (static::get('faq_page_subtitle') ?: ''),
+            'items'     => $items,
         ];
     }
 
+    /**
+     * Terms page content — always from admin RichEditor (no hardcoded body fallback).
+     */
     public static function termsConfig(): array
     {
         return [
-            'seo_title' => static::get('terms_seo_title', 'قوانین و مقررات'),
-            'title'     => static::get('terms_page_title', 'قوانین و مقررات'),
-            'subtitle'  => static::get('terms_page_subtitle', ''),
-            'content'   => static::get('terms_content', static::defaultTermsContent()),
+            'seo_title' => (string) (static::get('terms_seo_title') ?: 'قوانین و مقررات'),
+            'title'     => (string) (static::get('terms_page_title') ?: 'قوانین و مقررات'),
+            'subtitle'  => (string) (static::get('terms_page_subtitle') ?: ''),
+            'content'   => (string) (static::get('terms_content') ?: ''),
         ];
     }
 

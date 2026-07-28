@@ -594,6 +594,7 @@ class ThemeSettings extends Page implements HasForms
 
         Setting::ensureTermsMenuLinks();
         Setting::ensureFaqMenuLinks();
+        Setting::forgetAllCaches();
 
         $this->fillFormFromSettings();
 

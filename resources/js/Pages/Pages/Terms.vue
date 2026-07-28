@@ -25,7 +25,7 @@
         v-html="terms.content"
       />
       <div v-else class="card p-10 text-center text-gray-500">
-        هنوز متنی برای قوانین و مقررات ثبت نشده است.
+        هنوز متنی از پنل ادمین برای قوانین و مقررات ثبت نشده است.
       </div>
     </div>
   </MainLayout>
@@ -36,6 +36,13 @@ import { computed } from 'vue';
 import { Head, usePage } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
 
+const props = defineProps({
+  terms: {
+    type: Object,
+    default: null,
+  },
+});
+
 const page = usePage();
-const terms = computed(() => page.props.theme?.terms ?? {});
+const terms = computed(() => props.terms ?? page.props.theme?.terms ?? {});
 </script>

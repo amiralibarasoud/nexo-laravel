@@ -38,7 +38,7 @@
           </button>
           <div
             v-show="openIndex === index"
-            class="px-5 pb-5 text-gray-600 text-sm leading-loose border-t border-gray-50 pt-4"
+            class="px-5 pb-5 text-gray-600 text-sm leading-loose border-t border-gray-50 pt-4 whitespace-pre-line"
           >
             {{ item.answer }}
           </div>
@@ -46,7 +46,7 @@
       </div>
 
       <div v-else class="card p-10 text-center text-gray-500">
-        هنوز سوالی ثبت نشده است.
+        هنوز سوالی از پنل ادمین ثبت نشده است.
       </div>
     </div>
   </MainLayout>
@@ -57,9 +57,16 @@ import { computed, ref } from 'vue';
 import { Head, usePage } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
 
+const props = defineProps({
+  faq: {
+    type: Object,
+    default: null,
+  },
+});
+
 const page = usePage();
-const faq = computed(() => page.props.theme?.faq ?? {});
-const items = computed(() => (faq.value.items ?? []).filter((item) => item.question));
+const faq = computed(() => props.faq ?? page.props.theme?.faq ?? {});
+const items = computed(() => (faq.value.items ?? []).filter((item) => item?.question));
 const openIndex = ref(0);
 
 function toggle(index) {
