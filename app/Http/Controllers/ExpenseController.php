@@ -32,9 +32,7 @@ class ExpenseController extends Controller
 
         $weekStart = now()->subDays(6)->startOfDay();
         $weekEnd = now()->endOfDay();
-        $jalaliNow = Jalalian::fromCarbon(now());
-        $monthStart = Jalalian::fromFormat('Y/m/d', "{$jalaliNow->getYear()}/{$jalaliNow->getMonth()}/1")->toCarbon()->startOfDay();
-        $monthEnd = Jalalian::fromFormat('Y/m/d', "{$jalaliNow->getYear()}/{$jalaliNow->getMonth()}/{$jalaliNow->getMonthDays()}")->toCarbon()->endOfDay();
+        [$monthStart, $monthEnd] = $this->currentJalaliMonthRange();
 
         $weekTotal = (int) Expense::query()
             ->where('user_id', $user->id)
@@ -131,8 +129,24 @@ class ExpenseController extends Controller
         }
 
         $jalaliNow = Jalalian::fromCarbon(now());
-        $from = Jalalian::fromFormat('Y/m/d', "{$jalaliNow->getYear()}/{$jalaliNow->getMonth()}/1")->toCarbon()->startOfDay();
-        $to = Jalalian::fromFormat('Y/m/d', "{$jalaliNow->getYear()}/{$jalaliNow->getMonth()}/{$jalaliNow->getMonthDays()}")->toCarbon()->endOfDay();
+
+        return $this->currentJalaliMonthRange($jalaliNow);
+    }
+
+    /**
+     * @return array{0: Carbon, 1: Carbon}
+     */
+    private function currentJalaliMonthRange(?Jalalian $jalaliNow = null): array
+    {
+        $jalaliNow ??= Jalalian::fromCarbon(now());
+
+        $from = (new Jalalian($jalaliNow->getYear(), $jalaliNow->getMonth(), 1))
+            ->toCarbon()
+            ->startOfDay();
+
+        $to = $jalaliNow->getEndDayOfMonth()
+            ->toCarbon()
+            ->endOfDay();
 
         return [$from, $to];
     }

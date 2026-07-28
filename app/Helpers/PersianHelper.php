@@ -77,9 +77,22 @@ if (!function_exists('jalaliToGregorian')) {
     {
         try {
             $normalized = persianToEnglishNumber(trim($jalaliDate));
-            $normalized = str_replace(['-', '.'], '/', $normalized);
+            $normalized = str_replace(['-', '.', ' '], '/', $normalized);
+            $parts = array_values(array_filter(explode('/', $normalized), fn ($p) => $p !== ''));
 
-            return \Morilog\Jalali\Jalalian::fromFormat('Y/m/d', $normalized)->toCarbon()->startOfDay();
+            if (count($parts) !== 3) {
+                return null;
+            }
+
+            $year = (int) $parts[0];
+            $month = (int) $parts[1];
+            $day = (int) $parts[2];
+
+            if ($year < 1300 || $month < 1 || $month > 12 || $day < 1 || $day > 31) {
+                return null;
+            }
+
+            return (new \Morilog\Jalali\Jalalian($year, $month, $day))->toCarbon()->startOfDay();
         } catch (\Throwable $e) {
             return null;
         }
