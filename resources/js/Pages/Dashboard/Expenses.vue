@@ -62,11 +62,13 @@
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1.5">مبلغ (تومان)</label>
             <input
-              v-model="form.amount"
+              :value="form.amount"
               type="text"
               inputmode="numeric"
+              dir="ltr"
               placeholder="۵۰۰٬۰۰۰"
-              class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+              class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-left focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+              @input="onAmountInput"
             />
             <p v-if="form.errors.amount" class="text-red-500 text-xs mt-1">{{ form.errors.amount }}</p>
           </div>
@@ -317,6 +319,18 @@ function normalizeAmount(value) {
     .replace(/[۰-۹]/g, (d) => String(persian.indexOf(d)))
     .replace(/[٠-٩]/g, (d) => String(arabic.indexOf(d)))
     .replace(/[^\d]/g, '');
+}
+
+function formatAmountInput(value) {
+  const digits = normalizeAmount(value);
+  if (!digits) return '';
+
+  const grouped = digits.replace(/\B(?=(\d{3})+(?!\d))/g, '٬');
+  return toPersian(grouped);
+}
+
+function onAmountInput(event) {
+  form.amount = formatAmountInput(event.target.value);
 }
 
 function submitExpense() {
