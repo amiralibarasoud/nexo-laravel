@@ -158,7 +158,8 @@ class ThemeSettings extends Page implements HasForms
                     Tabs\Tab::make('قوانین و مقررات')->icon('heroicon-o-scale')->schema($this->termsSchema()),
                     Tabs\Tab::make('سوالات متداول')->icon('heroicon-o-question-mark-circle')->schema($this->faqSchema()),
                 ])
-                ->persistTabInQueryString(),
+                ->persistTabInQueryString()
+                ->contained(false),
         ])->statePath('data');
     }
 
@@ -585,13 +586,18 @@ class ThemeSettings extends Page implements HasForms
             'faq_seo_title'                => $data['faq_seo_title'] ?? 'سوالات متداول',
             'faq_page_title'               => $data['faq_page_title'] ?? 'سوالات متداول',
             'faq_page_subtitle'            => $data['faq_page_subtitle'] ?? '',
-            'faq_items'                    => json_encode($data['faq_items'] ?? [], JSON_UNESCAPED_UNICODE),
+            'faq_items'                    => json_encode(
+                Setting::normalizeFaqItems($data['faq_items'] ?? []),
+                JSON_UNESCAPED_UNICODE
+            ),
             'terms_seo_title'              => $data['terms_seo_title'] ?? 'قوانین و مقررات',
             'terms_page_title'             => $data['terms_page_title'] ?? 'قوانین و مقررات',
             'terms_page_subtitle'          => $data['terms_page_subtitle'] ?? '',
-            'terms_content'                => $data['terms_content'] ?? '',
+            'terms_content'                => $data['terms_content']
+                ?? Setting::getFresh('terms_content', Setting::defaultTermsContent()),
         ], 'theme');
 
+        Setting::flushThemeCache();
         Setting::ensureTermsMenuLinks();
         Setting::ensureFaqMenuLinks();
 

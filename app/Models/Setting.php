@@ -24,8 +24,47 @@ class Setting extends Model
             ['key' => $key],
             ['value' => $value, 'group' => $group]
         );
+        static::forgetCache($key, $group);
+    }
+
+    public static function forgetCache(string $key, ?string $group = null): void
+    {
         Cache::forget("setting:{$key}");
-        Cache::forget("settings:group:{$group}");
+
+        if ($group !== null) {
+            Cache::forget("settings:group:{$group}");
+        }
+    }
+
+    public static function flushThemeCache(): void
+    {
+        static::where('group', 'theme')->pluck('key')->each(
+            fn (string $key) => Cache::forget("setting:{$key}")
+        );
+        Cache::forget('settings:group:theme');
+    }
+
+    /**
+     * Read directly from DB (bypasses cache) for always-fresh page content.
+     */
+    public static function getFresh(string $key, mixed $default = null): mixed
+    {
+        $value = static::where('key', $key)->value('value');
+
+        return ($value === null || $value === '') ? $default : $value;
+    }
+
+    public static function getFreshJson(string $key, array $default = []): array
+    {
+        $val = static::getFresh($key);
+
+        if ($val === null || $val === '') {
+            return $default;
+        }
+
+        $decoded = json_decode((string) $val, true);
+
+        return is_array($decoded) ? $decoded : $default;
     }
 
     public static function setMany(array $data, string $group = 'general'): void
@@ -583,22 +622,50 @@ HTML;
 
     public static function faqConfig(): array
     {
+        $items = static::normalizeFaqItems(
+            static::getFreshJson('faq_items', static::defaultFaqItems())
+        );
+
         return [
-            'seo_title' => static::get('faq_seo_title', 'سوالات متداول'),
-            'title'     => static::get('faq_page_title', 'سوالات متداول'),
-            'subtitle'  => static::get('faq_page_subtitle', ''),
-            'items'     => static::getJson('faq_items', static::defaultFaqItems()),
+            'seo_title' => static::getFresh('faq_seo_title', 'سوالات متداول'),
+            'title'     => static::getFresh('faq_page_title', 'سوالات متداول'),
+            'subtitle'  => static::getFresh('faq_page_subtitle', ''),
+            'items'     => $items,
         ];
     }
 
     public static function termsConfig(): array
     {
         return [
-            'seo_title' => static::get('terms_seo_title', 'قوانین و مقررات'),
-            'title'     => static::get('terms_page_title', 'قوانین و مقررات'),
-            'subtitle'  => static::get('terms_page_subtitle', ''),
-            'content'   => static::get('terms_content', static::defaultTermsContent()),
+            'seo_title' => static::getFresh('terms_seo_title', 'قوانین و مقررات'),
+            'title'     => static::getFresh('terms_page_title', 'قوانین و مقررات'),
+            'subtitle'  => static::getFresh('terms_page_subtitle', ''),
+            'content'   => static::getFresh('terms_content', static::defaultTermsContent()),
         ];
+    }
+
+    /**
+     * Filament repeaters may store UUID-keyed objects; normalize to a list.
+     */
+    public static function normalizeFaqItems(array $items): array
+    {
+        return array_values(array_filter(array_map(function ($item) {
+            if (! is_array($item)) {
+                return null;
+            }
+
+            $question = trim((string) ($item['question'] ?? ''));
+            $answer = trim((string) ($item['answer'] ?? ''));
+
+            if ($question === '') {
+                return null;
+            }
+
+            return [
+                'question' => $question,
+                'answer'   => $answer,
+            ];
+        }, array_values($items))));
     }
 
     /**

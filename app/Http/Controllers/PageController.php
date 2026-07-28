@@ -44,11 +44,15 @@ class PageController extends Controller
 
     public function terms(): Response
     {
-        return Inertia::render('Pages/Terms');
+        return Inertia::render('Pages/Terms', [
+            'terms' => Setting::termsConfig(),
+        ]);
     }
 
     public function faq(): Response
     {
-        return Inertia::render('Pages/Faq');
+        return Inertia::render('Pages/Faq', [
+            'faq' => Setting::faqConfig(),
+        ]);
     }
 }
