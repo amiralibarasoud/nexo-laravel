@@ -64,7 +64,7 @@ class BlogController extends Controller
                     'slug' => $post->category->slug,
                     'color' => $post->category->color,
                 ] : null,
-                'author_name'          => $post->author?->name ?? 'تیم نکسو کورس',
+                'author_name'          => $post->author?->name ?? 'تیم نکسووست',
             ],
             'related' => $related,
         ]);
@@ -108,7 +108,7 @@ class BlogController extends Controller
                 'slug'  => $post->category->slug,
                 'color' => $post->category->color,
             ] : null,
-            'author_name'  => $post->author?->name ?? 'تیم نکسو کورس',
+            'author_name'  => $post->author?->name ?? 'تیم نکسووست',
         ];
     }
 }

@@ -7,7 +7,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import { createPinia } from 'pinia';
 
-const appName = import.meta.env.VITE_APP_NAME || 'نکسو کورس';
+const appName = import.meta.env.VITE_APP_NAME || 'نکسووست';
 
 createInertiaApp({
     title: (title) => title ? `${title} | ${appName}` : appName,

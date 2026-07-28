@@ -15,7 +15,7 @@ class HomeController extends Controller
         $featuredCourses = Course::published()
             ->featured()
             ->with('category')
-            ->withCount('enrollments')
+            ->withCount(['enrollments', 'lessons'])
             ->limit(6)
             ->get()
             ->map(fn($c) => [
@@ -31,7 +31,7 @@ class HomeController extends Controller
                 'is_discounted' => $c->is_discounted,
                 'discount_percent' => $c->discount_percent,
                 'has_variable_pricing' => $c->has_variable_pricing,
-                'students_count' => $c->students_count,
+                'students_count' => $c->resolveStudentsCount(),
                 'rating' => $c->rating,
                 'duration_minutes' => $c->duration_minutes,
                 'has_text' => $c->has_text,
@@ -48,6 +48,7 @@ class HomeController extends Controller
         $stats = [
             'courses_count'  => Course::published()->count(),
             'students_count' => \App\Models\Enrollment::count(),
+            'users_count'    => \App\Models\User::where('is_admin', false)->count(),
         ];
 
         $latestPosts = BlogPost::published()

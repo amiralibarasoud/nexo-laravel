@@ -41,6 +41,33 @@ class Lesson extends Model
         return $this->hasMany(LessonProgress::class);
     }
 
+    protected static function booted(): void
+    {
+        $sync = function (Lesson $lesson) {
+            if ($lesson->course_id) {
+                Course::where('id', $lesson->course_id)->update([
+                    'lessons_count' => Lesson::where('course_id', $lesson->course_id)->count(),
+                ]);
+            }
+
+            if ($lesson->wasChanged('course_id') && $lesson->getOriginal('course_id')) {
+                $oldCourseId = $lesson->getOriginal('course_id');
+                Course::where('id', $oldCourseId)->update([
+                    'lessons_count' => Lesson::where('course_id', $oldCourseId)->count(),
+                ]);
+            }
+        };
+
+        static::saved($sync);
+        static::deleted(function (Lesson $lesson) {
+            if ($lesson->course_id) {
+                Course::where('id', $lesson->course_id)->update([
+                    'lessons_count' => Lesson::where('course_id', $lesson->course_id)->count(),
+                ]);
+            }
+        });
+    }
+
     public function getAudioDurationFormattedAttribute(): string
     {
         if (!$this->audio_duration_seconds) {

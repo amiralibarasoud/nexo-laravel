@@ -6,7 +6,7 @@ import { h } from 'vue';
  * Usage: <SeoHead v-bind="seo" /> where seo = useSeo({...})
  */
 export function useSeo({ title, description, image, type = 'website', noIndex = false } = {}) {
-  const siteName = 'نکسو کورس';
+  const siteName = 'نکسووست';
   const fullTitle = title ? `${title} | ${siteName}` : siteName;
   const defaultDesc = 'پلتفرم یادگیری آنلاین فارسی — دوره‌های متنی و صوتی با بهترین اساتید';
   const metaDesc = description || defaultDesc;

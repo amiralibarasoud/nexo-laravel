@@ -9,7 +9,7 @@
             <div class="w-8 h-8 bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center">
               <span class="text-white font-bold">N</span>
             </div>
-            <span class="font-bold text-gray-900 text-lg">نکسو کورس</span>
+            <span class="font-bold text-gray-900 text-lg">نکسووست</span>
           </Link>
           <div class="flex items-center gap-3">
             <span class="text-gray-500 text-sm hidden sm:block">{{ $page.props.auth?.user?.name }}</span>

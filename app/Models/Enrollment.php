@@ -34,6 +34,19 @@ class Enrollment extends Model
         return $this->belongsTo(Order::class);
     }
 
+    protected static function booted(): void
+    {
+        static::created(function (Enrollment $enrollment) {
+            Course::where('id', $enrollment->course_id)->increment('students_count');
+        });
+
+        static::deleted(function (Enrollment $enrollment) {
+            Course::where('id', $enrollment->course_id)
+                ->where('students_count', '>', 0)
+                ->decrement('students_count');
+        });
+    }
+
     public function canAccessText(): bool
     {
         return in_array($this->content_type, ['text', 'both']);

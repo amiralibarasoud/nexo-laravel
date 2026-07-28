@@ -191,9 +191,9 @@
                 <span>مدت صوت</span>
                 <span class="font-semibold text-gray-700">{{ formatDur(course.duration_minutes) }}</span>
               </div>
-              <div v-if="course.lessons_count" class="flex justify-between">
+              <div v-if="lessonsCount" class="flex justify-between">
                 <span>تعداد جلسات</span>
-                <span class="font-semibold text-gray-700">{{ toPersian(course.lessons_count) }}</span>
+                <span class="font-semibold text-gray-700">{{ toPersian(lessonsCount) }}</span>
               </div>
               <div class="flex justify-between">
                 <span>سطح دوره</span>
@@ -221,6 +221,14 @@ const props = defineProps({
 const seoTitle = computed(() => props.course.title);
 const seoDesc = computed(() => props.course.short_description || `دوره ${props.course.title} - خرید و مشاهده دوره`);
 const seoImage = computed(() => props.course.cover_image ? `/storage/${props.course.cover_image}` : null);
+
+const lessonsCount = computed(() => {
+  const fromSections = (props.course.sections ?? []).reduce(
+    (sum, section) => sum + (section.lessons?.length ?? 0),
+    0
+  );
+  return fromSections || props.course.lessons_count || 0;
+});
 
 function toPersian(n) {
   return String(n ?? 0).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);

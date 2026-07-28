@@ -245,4 +245,49 @@ class Course extends Model
     {
         return $query->where('is_featured', true);
     }
+
+    /**
+     * Recalculate denormalized counters from related records.
+     */
+    public function syncCounters(): void
+    {
+        $this->updateQuietly([
+            'students_count' => $this->enrollments()->count(),
+            'lessons_count'  => $this->lessons()->count(),
+        ]);
+    }
+
+    /**
+     * Prefer eager-loaded enrollments_count when available.
+     */
+    public function resolveStudentsCount(): int
+    {
+        if (array_key_exists('enrollments_count', $this->attributes)) {
+            return (int) $this->attributes['enrollments_count'];
+        }
+
+        return (int) ($this->attributes['students_count'] ?? 0);
+    }
+
+    /**
+     * Prefer counting loaded curriculum; otherwise use stored / withCount value.
+     */
+    public function resolveLessonsCount(): int
+    {
+        if ($this->relationLoaded('sections')) {
+            return (int) $this->sections->sum(function ($section) {
+                if ($section->relationLoaded('lessons')) {
+                    return $section->lessons->count();
+                }
+
+                return $section->lessons()->count();
+            });
+        }
+
+        if ($this->relationLoaded('lessons')) {
+            return $this->lessons->count();
+        }
+
+        return (int) ($this->attributes['lessons_count'] ?? 0);
+    }
 }

@@ -46,4 +46,9 @@ class PageController extends Controller
     {
         return Inertia::render('Pages/Terms');
     }
+
+    public function faq(): Response
+    {
+        return Inertia::render('Pages/Faq');
+    }
 }

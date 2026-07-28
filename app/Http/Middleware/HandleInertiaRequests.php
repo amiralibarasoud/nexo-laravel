@@ -41,6 +41,8 @@ class HandleInertiaRequests extends Middleware
                 'footer'   => Setting::footerConfig(),
                 'contact'  => Setting::contactConfig(),
                 'about'    => Setting::aboutConfig(),
+                'faq'      => Setting::faqConfig(),
+                'terms'    => Setting::termsConfig(),
             ],
         ];
     }

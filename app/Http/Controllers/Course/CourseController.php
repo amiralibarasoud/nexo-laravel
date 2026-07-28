@@ -18,7 +18,7 @@ class CourseController extends Controller
     {
         $query = Course::published()
             ->with('category')
-            ->withCount('enrollments');
+            ->withCount(['enrollments', 'lessons']);
 
         if ($request->category) {
             $query->whereHas('category', fn($q) => $q->where('slug', $request->category));
@@ -48,6 +48,7 @@ class CourseController extends Controller
         }
 
         $course->load(['category', 'sections.lessons', 'reviews.user']);
+        $course->loadCount('enrollments');
 
         $isEnrolled = Auth::check() && Auth::user()->isEnrolledIn($course);
         $enrollment = $isEnrolled ? Auth::user()->getEnrollmentFor($course) : null;
@@ -274,9 +275,9 @@ class CourseController extends Controller
             'content_type_prices' => $course->getContentTypePrices(),
             'has_text' => $course->has_text,
             'has_audio' => $course->has_audio,
-            'students_count' => $course->students_count,
+            'students_count' => $course->resolveStudentsCount(),
             'duration_minutes' => $course->duration_minutes,
-            'lessons_count' => $course->lessons_count,
+            'lessons_count' => $course->resolveLessonsCount(),
             'rating' => $course->rating,
             'ratings_count' => $course->ratings_count,
             'level' => $course->level,

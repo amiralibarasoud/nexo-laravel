@@ -7,6 +7,7 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
@@ -44,7 +45,7 @@ class ThemeSettings extends Page implements HasForms
             'header_logo_letter'           => Setting::get('header_logo_letter', 'N'),
             'header_show_text_logo'        => Setting::getBool('header_show_text_logo', true),
             'header_site_name'             => Setting::get('header_site_name', 'نکسو'),
-            'header_site_name_highlight'   => Setting::get('header_site_name_highlight', 'نکسووست'),
+            'header_site_name_highlight'   => Setting::get('header_site_name_highlight', 'وست'),
             'header_logo_position'         => Setting::get('header_logo_position', 'start'),
             'header_sticky'                => Setting::getBool('header_sticky', true),
             'header_login_text'            => Setting::get('header_login_text', 'ورود / ثبت‌نام'),
@@ -133,6 +134,14 @@ class ThemeSettings extends Page implements HasForms
             'about_cta_subtitle'           => Setting::get('about_cta_subtitle', ''),
             'about_cta_button_text'        => Setting::get('about_cta_button_text', 'مشاهده دوره‌ها'),
             'about_cta_button_route'       => Setting::get('about_cta_button_route', 'courses.index'),
+            'faq_seo_title'                => Setting::get('faq_seo_title', 'سوالات متداول'),
+            'faq_page_title'               => Setting::get('faq_page_title', 'سوالات متداول'),
+            'faq_page_subtitle'            => Setting::get('faq_page_subtitle', ''),
+            'faq_items'                    => Setting::getJson('faq_items', Setting::defaultFaqItems()),
+            'terms_seo_title'              => Setting::get('terms_seo_title', 'قوانین و مقررات'),
+            'terms_page_title'             => Setting::get('terms_page_title', 'قوانین و مقررات'),
+            'terms_page_subtitle'          => Setting::get('terms_page_subtitle', ''),
+            'terms_content'                => Setting::get('terms_content', Setting::defaultTermsContent()),
         ]);
     }
 
@@ -146,6 +155,7 @@ class ThemeSettings extends Page implements HasForms
                     Tabs\Tab::make('فوتر')->icon('heroicon-o-rectangle-stack')->schema($this->footerSchema()),
                     Tabs\Tab::make('تماس با ما')->icon('heroicon-o-envelope')->schema($this->contactSchema()),
                     Tabs\Tab::make('درباره ما')->icon('heroicon-o-information-circle')->schema($this->aboutSchema()),
+                    Tabs\Tab::make('برگه‌ها')->icon('heroicon-o-document-text')->schema($this->pagesSchema()),
                 ])
                 ->persistTabInQueryString(),
         ])->statePath('data');
@@ -221,7 +231,8 @@ class ThemeSettings extends Page implements HasForms
                 Repeater::make('home_stats')->label('آیتم‌های آمار')->schema([
                     Select::make('type')->label('نوع مقدار')->options([
                         'dynamic_courses'  => 'تعداد دوره‌ها (خودکار)',
-                        'dynamic_students' => 'تعداد دانش‌آموز (خودکار)',
+                        'dynamic_students' => 'تعداد دانش‌آموز / خریدها (خودکار)',
+                        'dynamic_users'    => 'تعداد کاربران (خودکار)',
                         'manual'           => 'عدد دستی',
                     ])->required()->live()->native(false),
                     TextInput::make('value')->label('مقدار دستی')->maxLength(20)
@@ -391,6 +402,54 @@ class ThemeSettings extends Page implements HasForms
         ];
     }
 
+    protected function pagesSchema(): array
+    {
+        return [
+            Section::make('قوانین و مقررات')
+                ->description('متن صفحه /terms را اینجا وارد یا ویرایش کنید. لینک فوتر به همین صفحه وصل است.')
+                ->icon('heroicon-o-scale')
+                ->collapsible()
+                ->schema([
+                    Grid::make(2)->schema([
+                        TextInput::make('terms_seo_title')->label('عنوان SEO')->maxLength(80),
+                        TextInput::make('terms_page_title')->label('عنوان صفحه')->maxLength(100),
+                    ]),
+                    TextInput::make('terms_page_subtitle')
+                        ->label('زیرعنوان / تاریخ بروزرسانی')
+                        ->maxLength(150)
+                        ->columnSpanFull(),
+                    RichEditor::make('terms_content')
+                        ->label('متن قوانین و مقررات')
+                        ->toolbarButtons([
+                            'bold', 'italic', 'underline', 'strike',
+                            'h2', 'h3', 'bulletList', 'orderedList',
+                            'blockquote', 'link', 'undo', 'redo',
+                        ])
+                        ->columnSpanFull(),
+                ]),
+            Section::make('سوالات متداول')
+                ->description('عنوان صفحه و لیست سوال/جواب‌ها را اینجا مدیریت کنید.')
+                ->icon('heroicon-o-question-mark-circle')
+                ->collapsible()
+                ->schema([
+                    TextInput::make('faq_seo_title')->label('عنوان SEO')->maxLength(80),
+                    TextInput::make('faq_page_title')->label('عنوان صفحه')->maxLength(100),
+                    Textarea::make('faq_page_subtitle')->label('توضیح کوتاه بالای صفحه')->rows(2)->columnSpanFull(),
+                    Repeater::make('faq_items')
+                        ->label('سوالات و پاسخ‌ها')
+                        ->schema([
+                            TextInput::make('question')->label('سوال')->required()->maxLength(200)->columnSpanFull(),
+                            Textarea::make('answer')->label('پاسخ')->required()->rows(4)->columnSpanFull(),
+                        ])
+                        ->collapsible()
+                        ->reorderable()
+                        ->itemLabel(fn (array $state): ?string => $state['question'] ?? 'سوال جدید')
+                        ->defaultItems(1)
+                        ->columnSpanFull(),
+                ]),
+        ];
+    }
+
     protected function bgColorOptions(): array
     {
         return [
@@ -414,7 +473,8 @@ class ThemeSettings extends Page implements HasForms
     {
         return [
             'home' => 'خانه', 'courses.index' => 'دوره‌ها', 'blog.index' => 'بلاگ',
-            'about' => 'درباره ما', 'contact' => 'تماس', 'terms' => 'قوانین', 'login' => 'ورود',
+            'about' => 'درباره ما', 'contact' => 'تماس', 'terms' => 'قوانین',
+            'faq' => 'سوالات متداول', 'login' => 'ورود',
             '' => '— لینک سفارشی —',
         ];
     }
@@ -517,7 +577,18 @@ class ThemeSettings extends Page implements HasForms
             'about_cta_subtitle'           => $data['about_cta_subtitle'] ?? '',
             'about_cta_button_text'        => $data['about_cta_button_text'] ?? '',
             'about_cta_button_route'       => $data['about_cta_button_route'] ?? 'courses.index',
+            'faq_seo_title'                => $data['faq_seo_title'] ?? 'سوالات متداول',
+            'faq_page_title'               => $data['faq_page_title'] ?? 'سوالات متداول',
+            'faq_page_subtitle'            => $data['faq_page_subtitle'] ?? '',
+            'faq_items'                    => json_encode($data['faq_items'] ?? [], JSON_UNESCAPED_UNICODE),
+            'terms_seo_title'              => $data['terms_seo_title'] ?? 'قوانین و مقررات',
+            'terms_page_title'             => $data['terms_page_title'] ?? 'قوانین و مقررات',
+            'terms_page_subtitle'          => $data['terms_page_subtitle'] ?? '',
+            'terms_content'                => $data['terms_content'] ?? '',
         ], 'theme');
+
+        Setting::ensureTermsMenuLinks();
+        Setting::ensureFaqMenuLinks();
 
         $this->fillFormFromSettings();
 

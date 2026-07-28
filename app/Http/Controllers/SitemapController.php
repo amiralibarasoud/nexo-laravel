@@ -17,7 +17,8 @@ class SitemapController extends Controller
             ->add(Url::create('/courses')->setPriority(0.9)->setChangeFrequency('daily'))
             ->add(Url::create('/about')->setPriority(0.5))
             ->add(Url::create('/contact')->setPriority(0.5))
-            ->add(Url::create('/terms')->setPriority(0.3));
+            ->add(Url::create('/terms')->setPriority(0.3))
+            ->add(Url::create('/faq')->setPriority(0.4));
 
         $sitemap->add(Url::create('/blog')->setPriority(0.8)->setChangeFrequency('daily'));
 

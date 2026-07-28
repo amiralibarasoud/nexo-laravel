@@ -74,6 +74,7 @@ class Setting extends Model
             ['label' => 'دوره‌ها', 'route_name' => 'courses.index', 'url' => '', 'visible' => true],
             ['label' => 'درباره ما', 'route_name' => 'about', 'url' => '', 'visible' => true],
             ['label' => 'قوانین و مقررات', 'route_name' => 'terms', 'url' => '', 'visible' => true],
+            ['label' => 'سوالات متداول', 'route_name' => 'faq', 'url' => '', 'visible' => true],
         ];
     }
 
@@ -162,12 +163,12 @@ class Setting extends Model
             ['key' => 'contact_form_success_message', 'value' => 'پیام شما دریافت شد. به زودی با شما تماس می‌گیریم.', 'group' => 'theme'],
             ['key' => 'about_seo_title', 'value' => 'درباره ما', 'group' => 'theme'],
             ['key' => 'about_hero_enabled', 'value' => '1', 'group' => 'theme'],
-            ['key' => 'about_hero_title', 'value' => 'درباره نکسو کورس', 'group' => 'theme'],
+            ['key' => 'about_hero_title', 'value' => 'درباره نکسووست', 'group' => 'theme'],
             ['key' => 'about_hero_description', 'value' => 'ما یک پلتفرم آموزشی ایرانی هستیم که هدفمان ارائه آموزش‌های کاربردی به زبان فارسی است.', 'group' => 'theme'],
             ['key' => 'about_hero_image', 'value' => '', 'group' => 'theme'],
             ['key' => 'about_mission_enabled', 'value' => '1', 'group' => 'theme'],
             ['key' => 'about_mission_title', 'value' => 'مأموریت ما', 'group' => 'theme'],
-            ['key' => 'about_mission_paragraph1', 'value' => 'نکسو کورس با هدف دسترسی آسان‌تر به آموزش‌های باکیفیت فارسی تأسیس شد. ما بر این باوریم که هر فردی باید بتواند با هر بودجه و در هر شرایطی، به بهترین آموزش‌ها دسترسی داشته باشد.', 'group' => 'theme'],
+            ['key' => 'about_mission_paragraph1', 'value' => 'نکسووست با هدف دسترسی آسان‌تر به آموزش‌های باکیفیت فارسی تأسیس شد. ما بر این باوریم که هر فردی باید بتواند با هر بودجه و در هر شرایطی، به بهترین آموزش‌ها دسترسی داشته باشد.', 'group' => 'theme'],
             ['key' => 'about_mission_paragraph2', 'value' => 'نوآوری اصلی ما در ارائه محتوا به دو فرمت متنی و صوتی است — شما انتخاب می‌کنید که چطور یاد بگیرید.', 'group' => 'theme'],
             ['key' => 'about_mission_image', 'value' => '', 'group' => 'theme'],
             ['key' => 'about_mission_stats', 'value' => json_encode(static::defaultAboutStats(), JSON_UNESCAPED_UNICODE), 'group' => 'theme'],
@@ -179,6 +180,14 @@ class Setting extends Model
             ['key' => 'about_cta_subtitle', 'value' => 'همین الان اولین دوره‌ات رو شروع کن.', 'group' => 'theme'],
             ['key' => 'about_cta_button_text', 'value' => 'مشاهده دوره‌ها', 'group' => 'theme'],
             ['key' => 'about_cta_button_route', 'value' => 'courses.index', 'group' => 'theme'],
+            ['key' => 'faq_seo_title', 'value' => 'سوالات متداول', 'group' => 'theme'],
+            ['key' => 'faq_page_title', 'value' => 'سوالات متداول', 'group' => 'theme'],
+            ['key' => 'faq_page_subtitle', 'value' => 'پاسخ سوالات پرتکرار درباره خرید، دسترسی و استفاده از دوره‌ها.', 'group' => 'theme'],
+            ['key' => 'faq_items', 'value' => json_encode(static::defaultFaqItems(), JSON_UNESCAPED_UNICODE), 'group' => 'theme'],
+            ['key' => 'terms_seo_title', 'value' => 'قوانین و مقررات', 'group' => 'theme'],
+            ['key' => 'terms_page_title', 'value' => 'قوانین و مقررات', 'group' => 'theme'],
+            ['key' => 'terms_page_subtitle', 'value' => 'آخرین بروزرسانی: خرداد ۱۴۰۴', 'group' => 'theme'],
+            ['key' => 'terms_content', 'value' => static::defaultTermsContent(), 'group' => 'theme'],
         ];
     }
 
@@ -189,7 +198,7 @@ class Setting extends Model
             ['key' => 'header_logo_letter', 'value' => 'N', 'group' => 'theme'],
             ['key' => 'header_show_text_logo', 'value' => '1', 'group' => 'theme'],
             ['key' => 'header_site_name', 'value' => 'نکسو', 'group' => 'theme'],
-            ['key' => 'header_site_name_highlight', 'value' => 'کورس', 'group' => 'theme'],
+            ['key' => 'header_site_name_highlight', 'value' => 'وست', 'group' => 'theme'],
             ['key' => 'header_logo_position', 'value' => 'start', 'group' => 'theme'],
             ['key' => 'header_sticky', 'value' => '1', 'group' => 'theme'],
             ['key' => 'header_login_text', 'value' => 'ورود / ثبت‌نام', 'group' => 'theme'],
@@ -231,7 +240,7 @@ class Setting extends Model
             ['key' => 'home_content_cards', 'value' => json_encode(static::defaultHomeContentCards(), JSON_UNESCAPED_UNICODE), 'group' => 'theme'],
             ['key' => 'footer_logo', 'value' => '', 'group' => 'theme'],
             ['key' => 'footer_logo_letter', 'value' => 'N', 'group' => 'theme'],
-            ['key' => 'footer_site_name', 'value' => 'نکسو کورس', 'group' => 'theme'],
+            ['key' => 'footer_site_name', 'value' => 'نکسووست', 'group' => 'theme'],
             ['key' => 'footer_description', 'value' => 'پلتفرم یادگیری آنلاین با بهترین دوره‌های متنی و صوتی. یادگیری را به شیوه‌ای جدید تجربه کنید.', 'group' => 'theme'],
             ['key' => 'footer_links_title', 'value' => 'دسترسی سریع', 'group' => 'theme'],
             ['key' => 'footer_links', 'value' => json_encode(static::defaultFooterLinks(), JSON_UNESCAPED_UNICODE), 'group' => 'theme'],
@@ -241,7 +250,7 @@ class Setting extends Model
             ['key' => 'footer_address', 'value' => 'قم ـ بلوار جمهوری اسلامی ـ کوچه ۳۶ ـ ساختمان آسیا ـ طبقه دوم', 'group' => 'theme'],
             ['key' => 'footer_show_contact_link', 'value' => '1', 'group' => 'theme'],
             ['key' => 'footer_contact_link_text', 'value' => 'فرم تماس', 'group' => 'theme'],
-            ['key' => 'footer_copyright', 'value' => 'تمامی حقوق برای نکسو کورس محفوظ است © {year}', 'group' => 'theme'],
+            ['key' => 'footer_copyright', 'value' => 'تمامی حقوق برای نکسووست محفوظ است © {year}', 'group' => 'theme'],
             ...static::pageThemeSeedDefaults(),
         ];
     }
@@ -258,8 +267,51 @@ class Setting extends Model
             ['label' => 'دوره‌ها', 'route_name' => 'courses.index', 'url' => '', 'visible' => true],
             ['label' => 'بلاگ', 'route_name' => 'blog.index', 'url' => '', 'visible' => true],
             ['label' => 'درباره ما', 'route_name' => 'about', 'url' => '', 'visible' => true],
+            ['label' => 'سوالات متداول', 'route_name' => 'faq', 'url' => '', 'visible' => true],
             ['label' => 'تماس', 'route_name' => 'contact', 'url' => '', 'visible' => true],
         ];
+    }
+
+    public static function defaultFaqItems(): array
+    {
+        return [
+            [
+                'question' => 'چطور در یک دوره ثبت‌نام کنم؟',
+                'answer'   => 'دوره مورد نظر را انتخاب کنید، نوع محتوا (متنی، صوتی یا هر دو) را مشخص کنید و از طریق درگاه امن پرداخت کنید. دسترسی بلافاصله فعال می‌شود.',
+            ],
+            [
+                'question' => 'آیا می‌توانم محتوای صوتی را دانلود کنم؟',
+                'answer'   => 'خیر. محتوای صوتی فقط به صورت آنلاین پخش می‌شود و امکان دانلود آن وجود ندارد.',
+            ],
+            [
+                'question' => 'دسترسی به دوره‌ها تا چه زمانی فعال است؟',
+                'answer'   => 'پس از خرید، دسترسی شما به دوره مادام‌العمر است و می‌توانید هر زمان از هر دستگاهی استفاده کنید.',
+            ],
+            [
+                'question' => 'در صورت مشکل در پرداخت چه کنم؟',
+                'answer'   => 'از طریق صفحه تماس با ما پیام بگذارید تا تیم پشتیبانی در کوتاه‌ترین زمان پیگیری کند.',
+            ],
+        ];
+    }
+
+    public static function defaultTermsContent(): string
+    {
+        return <<<'HTML'
+<h2>پذیرش قوانین</h2>
+<p>با استفاده از خدمات نکسووست، شما قوانین و مقررات این صفحه را می‌پذیرید. لطفاً این قوانین را به دقت مطالعه کنید.</p>
+<h2>حساب کاربری</h2>
+<p>هر کاربر مجاز به داشتن یک حساب کاربری است. اطلاعات حساب کاربری شما محرمانه است و مسئولیت حفاظت از آن با شماست.</p>
+<h2>خرید و پرداخت</h2>
+<p>تمام پرداخت‌ها از طریق درگاه‌های معتبر بانکی انجام می‌شود. قیمت‌ها به تومان بوده و پس از تأیید پرداخت، دسترسی به دوره فوری است.</p>
+<h2>محتوای صوتی</h2>
+<p>محتوای صوتی دوره‌ها فقط به صورت آنلاین پخش می‌شود و امکان دانلود آن وجود ندارد. این محتوا دارای حق مالکیت معنوی است.</p>
+<h2>سیاست بازگشت وجه</h2>
+<p>در صورت بروز مشکل فنی از سمت ما، امکان بازگشت وجه وجود دارد. درخواست بازگشت وجه باید حداکثر ۷۲ ساعت پس از خرید ارسال شود.</p>
+<h2>مالکیت محتوا</h2>
+<p>تمام محتوای آموزشی ارائه‌شده در این پلتفرم دارای حق مالکیت معنوی است. کپی‌برداری، توزیع یا فروش مجدد محتوا بدون اجازه کتبی ممنوع است.</p>
+<h2>حریم خصوصی</h2>
+<p>اطلاعات شخصی شما (شماره موبایل، نام) نزد ما محفوظ است و هرگز به اشخاص ثالث فروخته یا منتقل نمی‌شود.</p>
+HTML;
     }
 
     public static function paymentConfig(): array
@@ -325,7 +377,7 @@ class Setting extends Model
             ['key' => 'zarinpal_sandbox', 'value' => '1', 'group' => 'payment'],
             ['key' => 'zibal_enabled', 'value' => '1', 'group' => 'payment'],
             ['key' => 'zibal_merchant', 'value' => 'zibal', 'group' => 'payment'],
-            ['key' => 'site_name', 'value' => 'نکسو کورس', 'group' => 'site'],
+            ['key' => 'site_name', 'value' => 'نکسووست', 'group' => 'site'],
             ['key' => 'site_support_phone', 'value' => '', 'group' => 'site'],
             ['key' => 'site_support_email', 'value' => 'info@nexocourse.ir', 'group' => 'site'],
             ...static::themeSeedDefaults(),
@@ -334,6 +386,46 @@ class Setting extends Model
         foreach ($defaults as $item) {
             static::firstOrCreate(['key' => $item['key']], $item);
         }
+
+        static::syncBrandName();
+        static::ensureFaqMenuLinks();
+        static::ensureTermsMenuLinks();
+    }
+
+    /**
+     * Force-update brand-facing settings to نکسووست (safe to re-run).
+     */
+    public static function syncBrandName(): void
+    {
+        $brandKeys = [
+            'site_name'                    => ['value' => 'نکسووست', 'group' => 'site'],
+            'header_site_name'             => ['value' => 'نکسو', 'group' => 'theme'],
+            'header_site_name_highlight'   => ['value' => 'وست', 'group' => 'theme'],
+            'footer_site_name'             => ['value' => 'نکسووست', 'group' => 'theme'],
+            'footer_copyright'             => ['value' => 'تمامی حقوق برای نکسووست محفوظ است © {year}', 'group' => 'theme'],
+            'about_hero_title'             => ['value' => 'درباره نکسووست', 'group' => 'theme'],
+            'about_mission_paragraph1'     => [
+                'value' => 'نکسووست با هدف دسترسی آسان‌تر به آموزش‌های باکیفیت فارسی تأسیس شد. ما بر این باوریم که هر فردی باید بتواند با هر بودجه و در هر شرایطی، به بهترین آموزش‌ها دسترسی داشته باشد.',
+                'group' => 'theme',
+            ],
+        ];
+
+        foreach ($brandKeys as $key => $data) {
+            static::updateOrCreate(
+                ['key' => $key],
+                ['value' => $data['value'], 'group' => $data['group']]
+            );
+        }
+
+        // Replace leftover brand name inside any stored text values.
+        static::query()
+            ->where('value', 'like', '%نکسو کورس%')
+            ->get()
+            ->each(function (self $setting) {
+                $setting->update([
+                    'value' => str_replace('نکسو کورس', 'نکسووست', $setting->value),
+                ]);
+            });
     }
 
     public static function headerConfig(): array
@@ -345,7 +437,7 @@ class Setting extends Model
             'logo_letter'           => static::get('header_logo_letter', 'N'),
             'show_text_logo'        => static::getBool('header_show_text_logo', true),
             'site_name'             => static::get('header_site_name', 'نکسو'),
-            'site_name_highlight'   => static::get('header_site_name_highlight', 'کورس'),
+            'site_name_highlight'   => static::get('header_site_name_highlight', 'وست'),
             'logo_position'         => static::get('header_logo_position', 'start'),
             'sticky'                => static::getBool('header_sticky', true),
             'login_text'            => static::get('header_login_text', 'ورود / ثبت‌نام'),
@@ -417,7 +509,7 @@ class Setting extends Model
         return [
             'logo'               => static::storageUrl($logo),
             'logo_letter'        => static::get('footer_logo_letter', 'N'),
-            'site_name'          => static::get('footer_site_name', 'نکسو کورس'),
+            'site_name'          => static::get('footer_site_name', 'نکسووست'),
             'description'        => static::get('footer_description', ''),
             'links_title'        => static::get('footer_links_title', 'دسترسی سریع'),
             'links'              => static::getJson('footer_links', static::defaultFooterLinks()),
@@ -427,7 +519,7 @@ class Setting extends Model
             'address'            => static::get('footer_address', 'قم ـ بلوار جمهوری اسلامی ـ کوچه ۳۶ ـ ساختمان آسیا ـ طبقه دوم'),
             'show_contact_link'  => static::getBool('footer_show_contact_link', true),
             'contact_link_text'  => static::get('footer_contact_link_text', 'فرم تماس'),
-            'copyright'          => static::get('footer_copyright', 'تمامی حقوق برای نکسو کورس محفوظ است © {year}'),
+            'copyright'          => static::get('footer_copyright', 'تمامی حقوق برای نکسووست محفوظ است © {year}'),
         ];
     }
 
@@ -462,7 +554,7 @@ class Setting extends Model
             'seo_title' => static::get('about_seo_title', 'درباره ما'),
             'hero'      => [
                 'enabled'     => static::getBool('about_hero_enabled', true),
-                'title'       => static::get('about_hero_title', 'درباره نکسو کورس'),
+                'title'       => static::get('about_hero_title', 'درباره نکسووست'),
                 'description' => static::get('about_hero_description', ''),
                 'image'       => static::storageUrl(static::get('about_hero_image')),
             ],
@@ -487,5 +579,133 @@ class Setting extends Model
                 'button_route'=> static::get('about_cta_button_route', 'courses.index'),
             ],
         ];
+    }
+
+    public static function faqConfig(): array
+    {
+        return [
+            'seo_title' => static::get('faq_seo_title', 'سوالات متداول'),
+            'title'     => static::get('faq_page_title', 'سوالات متداول'),
+            'subtitle'  => static::get('faq_page_subtitle', ''),
+            'items'     => static::getJson('faq_items', static::defaultFaqItems()),
+        ];
+    }
+
+    public static function termsConfig(): array
+    {
+        return [
+            'seo_title' => static::get('terms_seo_title', 'قوانین و مقررات'),
+            'title'     => static::get('terms_page_title', 'قوانین و مقررات'),
+            'subtitle'  => static::get('terms_page_subtitle', ''),
+            'content'   => static::get('terms_content', static::defaultTermsContent()),
+        ];
+    }
+
+    /**
+     * Ensure Terms link exists in footer (before FAQ when possible).
+     */
+    public static function ensureTermsMenuLinks(): void
+    {
+        $footerLinks = static::getJson('footer_links', static::defaultFooterLinks());
+        $hasTermsFooter = collect($footerLinks)->contains(fn ($item) => ($item['route_name'] ?? '') === 'terms');
+
+        if (!$hasTermsFooter) {
+            $updatedFooter = [];
+            $inserted = false;
+
+            foreach ($footerLinks as $item) {
+                if (($item['route_name'] ?? '') === 'faq' && !$inserted) {
+                    $updatedFooter[] = [
+                        'label' => 'قوانین و مقررات',
+                        'route_name' => 'terms',
+                        'url' => '',
+                        'visible' => true,
+                    ];
+                    $inserted = true;
+                }
+                $updatedFooter[] = $item;
+            }
+
+            if (!$inserted) {
+                $updatedFooter[] = [
+                    'label' => 'قوانین و مقررات',
+                    'route_name' => 'terms',
+                    'url' => '',
+                    'visible' => true,
+                ];
+            }
+
+            static::set('footer_links', json_encode($updatedFooter, JSON_UNESCAPED_UNICODE), 'theme');
+        }
+    }
+
+    /**
+     * Ensure FAQ appears in header/footer menus (after terms in footer).
+     */
+    public static function ensureFaqMenuLinks(): void
+    {
+        $footerLinks = static::getJson('footer_links', static::defaultFooterLinks());
+        $hasFaqFooter = collect($footerLinks)->contains(fn ($item) => ($item['route_name'] ?? '') === 'faq');
+
+        if (!$hasFaqFooter) {
+            $inserted = false;
+            $updatedFooter = [];
+
+            foreach ($footerLinks as $item) {
+                $updatedFooter[] = $item;
+                if (($item['route_name'] ?? '') === 'terms') {
+                    $updatedFooter[] = [
+                        'label' => 'سوالات متداول',
+                        'route_name' => 'faq',
+                        'url' => '',
+                        'visible' => true,
+                    ];
+                    $inserted = true;
+                }
+            }
+
+            if (!$inserted) {
+                $updatedFooter[] = [
+                    'label' => 'سوالات متداول',
+                    'route_name' => 'faq',
+                    'url' => '',
+                    'visible' => true,
+                ];
+            }
+
+            static::set('footer_links', json_encode($updatedFooter, JSON_UNESCAPED_UNICODE), 'theme');
+        }
+
+        $navLinks = static::getJson('header_nav_links', static::defaultNavLinks());
+        $hasFaqNav = collect($navLinks)->contains(fn ($item) => ($item['route_name'] ?? '') === 'faq');
+
+        if (!$hasFaqNav) {
+            $updatedNav = [];
+            $inserted = false;
+
+            foreach ($navLinks as $item) {
+                if (($item['route_name'] ?? '') === 'contact' && !$inserted) {
+                    $updatedNav[] = [
+                        'label' => 'سوالات متداول',
+                        'route_name' => 'faq',
+                        'url' => '',
+                        'visible' => true,
+                    ];
+                    $inserted = true;
+                }
+                $updatedNav[] = $item;
+            }
+
+            if (!$inserted) {
+                $updatedNav[] = [
+                    'label' => 'سوالات متداول',
+                    'route_name' => 'faq',
+                    'url' => '',
+                    'visible' => true,
+                ];
+            }
+
+            static::set('header_nav_links', json_encode($updatedNav, JSON_UNESCAPED_UNICODE), 'theme');
+        }
     }
 }

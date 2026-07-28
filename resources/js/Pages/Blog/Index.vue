@@ -1,15 +1,15 @@
 <template>
   <MainLayout>
     <Head title="بلاگ">
-      <meta name="description" content="آخرین مقالات و آموزش‌های نکسو کورس">
-      <meta property="og:title" content="بلاگ | نکسو کورس">
-      <meta property="og:description" content="آخرین مقالات و آموزش‌های نکسو کورس">
+      <meta name="description" content="آخرین مقالات و آموزش‌های نکسووست">
+      <meta property="og:title" content="بلاگ | نکسووست">
+      <meta property="og:description" content="آخرین مقالات و آموزش‌های نکسووست">
     </Head>
 
     <!-- Header -->
     <div class="bg-gradient-to-br from-gray-900 to-primary-900 py-16 text-white text-center">
       <div class="max-w-3xl mx-auto px-4">
-        <h1 class="text-4xl font-black mb-3">بلاگ نکسو کورس</h1>
+        <h1 class="text-4xl font-black mb-3">بلاگ نکسووست</h1>
         <p class="text-gray-300 text-lg">آخرین مقالات، آموزش‌ها و اخبار</p>
       </div>
     </div>

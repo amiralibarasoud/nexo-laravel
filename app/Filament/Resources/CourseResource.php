@@ -158,7 +158,11 @@ class CourseResource extends Resource
                         return $record->has_variable_pricing ? 'از ' . price($amount) : price($amount);
                     })
                     ->sortable(query: fn ($query, $direction) => $query->orderBy('price', $direction)),
-                Tables\Columns\TextColumn::make('students_count')->label('دانش‌آموز')->formatStateUsing(fn($state) => toFarsiNumber($state))->sortable(),
+                Tables\Columns\TextColumn::make('enrollments_count')
+                    ->counts('enrollments')
+                    ->label('دانش‌آموز')
+                    ->formatStateUsing(fn($state) => toFarsiNumber($state))
+                    ->sortable(),
                 Tables\Columns\IconColumn::make('has_text')->label('متن')->boolean(),
                 Tables\Columns\IconColumn::make('has_audio')->label('صوت')->boolean(),
                 Tables\Columns\SelectColumn::make('status')->label('وضعیت')

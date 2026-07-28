@@ -69,14 +69,10 @@ class PaymentController extends Controller
     {
         $allowedGateways = Setting::enabledGateways();
 
-        if (empty($allowedGateways)) {
-            return redirect()->back()->with('error', 'هیچ درگاه پرداختی فعال نیست.');
-        }
-
         $request->validate([
             'course_id'    => ['required', 'exists:courses,id'],
             'content_type' => ['required', 'in:text,audio,both'],
-            'gateway'      => ['required', \Illuminate\Validation\Rule::in($allowedGateways)],
+            'gateway'      => ['nullable', 'string'],
             'coupon_code'  => ['nullable', 'string'],
         ]);
 
@@ -104,6 +100,16 @@ class PaymentController extends Controller
             }
         }
 
+        if ($amount > 0) {
+            if (empty($allowedGateways)) {
+                return redirect()->back()->with('error', 'هیچ درگاه پرداختی فعال نیست.');
+            }
+
+            $request->validate([
+                'gateway' => ['required', \Illuminate\Validation\Rule::in($allowedGateways)],
+            ]);
+        }
+
         return DB::transaction(function () use ($request, $course, $user, $amount, $originalAmount, $discountAmount, $coupon) {
             $order = Order::create([
                 'user_id'         => $user->id,
@@ -116,6 +122,32 @@ class PaymentController extends Controller
                 'content_type'    => $request->content_type,
                 'status'          => 'pending',
             ]);
+
+            // Free course / 100% discount: enroll immediately without gateway.
+            if ($amount <= 0) {
+                $order->update(['status' => 'paid']);
+
+                Enrollment::create([
+                    'user_id'      => $user->id,
+                    'course_id'    => $course->id,
+                    'order_id'     => $order->id,
+                    'content_type' => $order->content_type,
+                    'enrolled_at'  => now(),
+                ]);
+
+                if ($order->coupon_id && $order->discount_amount > 0) {
+                    CouponUsage::create([
+                        'coupon_id'       => $order->coupon_id,
+                        'user_id'         => $order->user_id,
+                        'order_id'        => $order->id,
+                        'discount_amount' => $order->discount_amount,
+                    ]);
+                    Coupon::where('id', $order->coupon_id)->increment('usage_count');
+                }
+
+                return redirect()->route('courses.learn', $course->slug)
+                    ->with('success', 'دوره با موفقیت برای شما فعال شد.');
+            }
 
             $callbackUrl = route('payment.callback', ['gateway' => $request->gateway, 'order' => $order->id]);
 
@@ -201,8 +233,6 @@ class PaymentController extends Controller
                     'content_type' => $order->content_type,
                     'enrolled_at' => now(),
                 ]);
-
-                Course::where('id', $order->course_id)->increment('students_count');
 
                 if ($order->coupon_id && $order->discount_amount > 0) {
                     CouponUsage::create([

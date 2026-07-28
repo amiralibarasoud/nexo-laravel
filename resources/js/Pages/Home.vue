@@ -265,6 +265,7 @@ function resolveRoute(routeName) {
 function resolveStatValue(stat) {
   if (stat.type === 'dynamic_courses') return props.stats?.courses_count ?? 0;
   if (stat.type === 'dynamic_students') return props.stats?.students_count ?? 0;
+  if (stat.type === 'dynamic_users') return props.stats?.users_count ?? 0;
   return stat.value ?? '';
 }
 

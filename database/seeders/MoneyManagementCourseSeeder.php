@@ -31,7 +31,7 @@ class MoneyManagementCourseSeeder extends Seeder
             'status'           => 'published',
             'is_featured'      => true,
             'published_at'     => now(),
-            'lessons_count'    => 16,
+            'lessons_count'    => 0,
             'duration_minutes' => 480,
             'students_count'   => 0,
         ]);
@@ -61,7 +61,10 @@ class MoneyManagementCourseSeeder extends Seeder
             }
         }
 
-        $this->command->info("✅ دوره 'مدیریت پول' با ۴ فصل و ۱۶ درس ایجاد شد.");
+        $course->syncCounters();
+        $lessonsTotal = $course->fresh()->lessons_count;
+
+        $this->command->info("✅ دوره 'مدیریت پول' با {$lessonsTotal} جلسه ایجاد شد.");
     }
 
     private function getCourseDescription(): string

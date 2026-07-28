@@ -54,20 +54,19 @@
             </li>
           </ul>
 
+          <!-- اینماد — همیشه نمایش داده می‌شود -->
           <div class="mt-6">
             <div class="bg-white rounded-xl px-3 py-2.5 shadow-md inline-flex items-center justify-center">
               <a
                 referrerpolicy="origin"
                 target="_blank"
-                rel="noopener noreferrer"
                 href="https://trustseal.enamad.ir/?id=6394905&Code=hcKPUvpSgtS3vgs6OG5gN6pjGcliJOAm"
-                class="inline-block leading-none"
               >
                 <img
                   referrerpolicy="origin"
                   src="https://trustseal.enamad.ir/logo.aspx?id=6394905&Code=hcKPUvpSgtS3vgs6OG5gN6pjGcliJOAm"
-                  alt="نماد اعتماد الکترونیکی"
-                  class="h-[88px] w-auto cursor-pointer block"
+                  alt=""
+                  style="cursor:pointer"
                   code="hcKPUvpSgtS3vgs6OG5gN6pjGcliJOAm"
                 />
               </a>

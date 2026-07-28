@@ -2,7 +2,7 @@
 
 ## Cursor Cloud specific instructions
 
-This is a **Laravel 12** app ("نکسو کورس" — a Persian/RTL online course platform) with a
+This is a **Laravel 12** app ("نکسووست" — a Persian/RTL online course platform) with a
 **Filament 3** admin panel and an **Inertia + Vue 3** public frontend. Localization is Persian
 (Jalali calendar). PHP 8.3, Node 22, and Composer are preinstalled in this environment.
 
