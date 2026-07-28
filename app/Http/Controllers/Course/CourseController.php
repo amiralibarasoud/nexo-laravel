@@ -47,11 +47,63 @@ class CourseController extends Controller
             abort(404);
         }
 
-        $course->load(['category', 'sections.lessons', 'reviews.user']);
-        $course->loadCount('enrollments');
+        $course->load([
+            'category',
+            'sections' => fn ($q) => $q->orderBy('sort_order'),
+            'lessons' => fn ($q) => $q->orderBy('sort_order'),
+            'reviews.user',
+        ]);
+
+        // Always keep denormalized lessons_count equal to real lesson rows.
+        $realLessonsCount = $course->lessons->count();
+        $course->updateQuietly([
+            'lessons_count' => $realLessonsCount,
+            'students_count' => $course->enrollments()->count(),
+        ]);
+
+        $course->loadCount(['enrollments', 'lessons']);
 
         $isEnrolled = Auth::check() && Auth::user()->isEnrolledIn($course);
         $enrollment = $isEnrolled ? Auth::user()->getEnrollmentFor($course) : null;
+
+        $mapLesson = fn ($l) => [
+            'id' => $l->id,
+            'title' => $l->title,
+            'duration' => $l->audio_duration_formatted,
+            'is_preview' => $l->is_preview,
+            'has_audio' => (bool) $l->audio_path,
+            'has_text' => (bool) $l->text_content,
+        ];
+
+        $lessonsBySection = $course->lessons->groupBy(fn ($l) => $l->section_id ?: 0);
+
+        $sections = $course->sections->map(function ($s) use ($lessonsBySection, $mapLesson) {
+            $lessons = ($lessonsBySection->get($s->id) ?? collect())->values();
+
+            return [
+                'id' => $s->id,
+                'title' => $s->title,
+                'lessons' => $lessons->map($mapLesson)->values(),
+            ];
+        })->filter(fn ($s) => count($s['lessons']) > 0)->values();
+
+        $orphanLessons = ($lessonsBySection->get(0) ?? collect())->values();
+        if ($orphanLessons->isNotEmpty()) {
+            $sections->push([
+                'id' => 0,
+                'title' => 'جلسات دوره',
+                'lessons' => $orphanLessons->map($mapLesson)->values(),
+            ]);
+        }
+
+        // If course has lessons but no sections at all, still show them.
+        if ($sections->isEmpty() && $course->lessons->isNotEmpty()) {
+            $sections = collect([[
+                'id' => 0,
+                'title' => 'سرفصل‌ها',
+                'lessons' => $course->lessons->map($mapLesson)->values(),
+            ]]);
+        }
 
         return Inertia::render('Courses/Show', [
             'course' => [
@@ -59,18 +111,8 @@ class CourseController extends Controller
                 'description' => $course->description,
                 'instructor_bio' => $course->instructor_bio,
                 'instructor_avatar' => $course->instructor_avatar,
-                'sections' => $course->sections->map(fn($s) => [
-                    'id' => $s->id,
-                    'title' => $s->title,
-                    'lessons' => $s->lessons->map(fn($l) => [
-                        'id' => $l->id,
-                        'title' => $l->title,
-                        'duration' => $l->audio_duration_formatted,
-                        'is_preview' => $l->is_preview,
-                        'has_audio' => (bool) $l->audio_path,
-                        'has_text' => (bool) $l->text_content,
-                    ]),
-                ]),
+                'lessons_count' => $course->lessons->count(),
+                'sections' => $sections,
                 'reviews' => $course->reviews->take(5)->map(fn($r) => [
                     'id' => $r->id,
                     'user_name' => $r->user->name,
@@ -99,12 +141,68 @@ class CourseController extends Controller
                 ->with('error', 'ابتدا باید دوره را خریداری کنید.');
         }
 
-        $course->load(['sections.lessons']);
+        $course->load([
+            'sections' => fn ($q) => $q->orderBy('sort_order'),
+            'lessons' => fn ($q) => $q->orderBy('sort_order'),
+        ]);
 
         $progress = LessonProgress::where('user_id', Auth::id())
             ->where('course_id', $course->id)
             ->get()
             ->keyBy(fn($p) => "{$p->lesson_id}_{$p->type}");
+
+        $mapLearnLesson = function ($l) use ($enrollment, $progress) {
+            if (!$l->is_published) {
+                return null;
+            }
+
+            return [
+                'id' => $l->id,
+                'title' => $l->title,
+                'has_text' => (bool) $l->text_content && $enrollment->canAccessText(),
+                'has_audio' => (bool) $l->audio_path && $enrollment->canAccessAudio(),
+                'duration' => $l->audio_duration_formatted,
+                'text_completed' => $progress->has("{$l->id}_text") && $progress["{$l->id}_text"]->is_completed,
+                'audio_completed' => $progress->has("{$l->id}_audio") && $progress["{$l->id}_audio"]->is_completed,
+                'audio_position' => $progress->has("{$l->id}_audio") ? $progress["{$l->id}_audio"]->audio_position_seconds : 0,
+            ];
+        };
+
+        $lessonsBySection = $course->lessons->groupBy(fn ($l) => $l->section_id ?: 0);
+
+        $sections = $course->sections->map(function ($s) use ($lessonsBySection, $mapLearnLesson) {
+            $lessons = ($lessonsBySection->get($s->id) ?? collect())
+                ->map($mapLearnLesson)
+                ->filter()
+                ->values();
+
+            return [
+                'id' => $s->id,
+                'title' => $s->title,
+                'lessons' => $lessons,
+            ];
+        })->filter(fn ($s) => count($s['lessons']) > 0)->values();
+
+        $orphanLessons = ($lessonsBySection->get(0) ?? collect())
+            ->map($mapLearnLesson)
+            ->filter()
+            ->values();
+
+        if ($orphanLessons->isNotEmpty()) {
+            $sections->push([
+                'id' => 0,
+                'title' => 'جلسات دوره',
+                'lessons' => $orphanLessons,
+            ]);
+        }
+
+        if ($sections->isEmpty()) {
+            $sections = collect([[
+                'id' => 0,
+                'title' => 'سرفصل‌ها',
+                'lessons' => $course->lessons->map($mapLearnLesson)->filter()->values(),
+            ]]);
+        }
 
         return Inertia::render('Courses/Learn', [
             'course' => [
@@ -113,20 +211,7 @@ class CourseController extends Controller
                 'slug' => $course->slug,
                 'cover_image' => $course->cover_image,
                 'instructor_name' => $course->instructor_name,
-                'sections' => $course->sections->map(fn($s) => [
-                    'id' => $s->id,
-                    'title' => $s->title,
-                    'lessons' => $s->lessons->filter(fn($l) => $l->is_published)->map(fn($l) => [
-                        'id' => $l->id,
-                        'title' => $l->title,
-                        'has_text' => (bool) $l->text_content && $enrollment->canAccessText(),
-                        'has_audio' => (bool) $l->audio_path && $enrollment->canAccessAudio(),
-                        'duration' => $l->audio_duration_formatted,
-                        'text_completed' => $progress->has("{$l->id}_text") && $progress["{$l->id}_text"]->is_completed,
-                        'audio_completed' => $progress->has("{$l->id}_audio") && $progress["{$l->id}_audio"]->is_completed,
-                        'audio_position' => $progress->has("{$l->id}_audio") ? $progress["{$l->id}_audio"]->audio_position_seconds : 0,
-                    ])->values(),
-                ]),
+                'sections' => $sections,
             ],
             'enrollment' => [
                 'content_type' => $enrollment->content_type,

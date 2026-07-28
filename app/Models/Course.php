@@ -270,24 +270,19 @@ class Course extends Model
     }
 
     /**
-     * Prefer counting loaded curriculum; otherwise use stored / withCount value.
+     * Always reflect real lesson rows for this course.
      */
     public function resolveLessonsCount(): int
     {
-        if ($this->relationLoaded('sections')) {
-            return (int) $this->sections->sum(function ($section) {
-                if ($section->relationLoaded('lessons')) {
-                    return $section->lessons->count();
-                }
-
-                return $section->lessons()->count();
-            });
-        }
-
         if ($this->relationLoaded('lessons')) {
             return $this->lessons->count();
         }
 
-        return (int) ($this->attributes['lessons_count'] ?? 0);
+        // withCount('lessons') / loadCount('lessons') populate this attribute.
+        if (array_key_exists('lessons_count', $this->attributes)) {
+            return (int) $this->attributes['lessons_count'];
+        }
+
+        return (int) $this->lessons()->count();
     }
 }

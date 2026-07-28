@@ -31,7 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->brandName('')
+            ->brandName('نکسووست')
             ->brandLogo(fn (): string => Setting::footerConfig()['logo'] ?: asset('favicon.ico'))
             ->brandLogoHeight('2.5rem')
             ->favicon(asset('favicon.ico'))

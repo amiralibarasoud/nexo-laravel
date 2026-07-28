@@ -227,7 +227,8 @@ const lessonsCount = computed(() => {
     (sum, section) => sum + (section.lessons?.length ?? 0),
     0
   );
-  return fromSections || props.course.lessons_count || 0;
+  // Prefer real listed lessons; fall back to backend count.
+  return fromSections || Number(props.course.lessons_count) || 0;
 });
 
 function toPersian(n) {

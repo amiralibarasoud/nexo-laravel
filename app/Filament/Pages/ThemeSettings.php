@@ -155,7 +155,8 @@ class ThemeSettings extends Page implements HasForms
                     Tabs\Tab::make('فوتر')->icon('heroicon-o-rectangle-stack')->schema($this->footerSchema()),
                     Tabs\Tab::make('تماس با ما')->icon('heroicon-o-envelope')->schema($this->contactSchema()),
                     Tabs\Tab::make('درباره ما')->icon('heroicon-o-information-circle')->schema($this->aboutSchema()),
-                    Tabs\Tab::make('برگه‌ها')->icon('heroicon-o-document-text')->schema($this->pagesSchema()),
+                    Tabs\Tab::make('قوانین و مقررات')->icon('heroicon-o-scale')->schema($this->termsSchema()),
+                    Tabs\Tab::make('سوالات متداول')->icon('heroicon-o-question-mark-circle')->schema($this->faqSchema()),
                 ])
                 ->persistTabInQueryString(),
         ])->statePath('data');
@@ -402,13 +403,12 @@ class ThemeSettings extends Page implements HasForms
         ];
     }
 
-    protected function pagesSchema(): array
+    protected function termsSchema(): array
     {
         return [
-            Section::make('قوانین و مقررات')
-                ->description('متن صفحه /terms را اینجا وارد یا ویرایش کنید. لینک فوتر به همین صفحه وصل است.')
+            Section::make('صفحه قوانین و مقررات')
+                ->description('متن صفحه /terms — لینک فوتر «قوانین و مقررات» به همین صفحه وصل است.')
                 ->icon('heroicon-o-scale')
-                ->collapsible()
                 ->schema([
                     Grid::make(2)->schema([
                         TextInput::make('terms_seo_title')->label('عنوان SEO')->maxLength(80),
@@ -427,10 +427,15 @@ class ThemeSettings extends Page implements HasForms
                         ])
                         ->columnSpanFull(),
                 ]),
-            Section::make('سوالات متداول')
-                ->description('عنوان صفحه و لیست سوال/جواب‌ها را اینجا مدیریت کنید.')
+        ];
+    }
+
+    protected function faqSchema(): array
+    {
+        return [
+            Section::make('صفحه سوالات متداول')
+                ->description('متن صفحه /faq — لینک فوتر «سوالات متداول» به همین صفحه وصل است.')
                 ->icon('heroicon-o-question-mark-circle')
-                ->collapsible()
                 ->schema([
                     TextInput::make('faq_seo_title')->label('عنوان SEO')->maxLength(80),
                     TextInput::make('faq_page_title')->label('عنوان صفحه')->maxLength(100),

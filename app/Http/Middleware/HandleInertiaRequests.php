@@ -34,6 +34,7 @@ class HandleInertiaRequests extends Middleware
                 'error'   => fn() => $request->session()->get('error'),
                 'info'    => fn() => $request->session()->get('info'),
             ],
+            'app_name'   => fn () => Setting::get('site_name', 'نکسووست') ?: 'نکسووست',
             'jalali_now' => toJalali(now(), 'Y/m/d'),
             'theme'      => fn () => [
                 'header'   => Setting::headerConfig(),

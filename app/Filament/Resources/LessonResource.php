@@ -123,7 +123,10 @@ class LessonResource extends Resource
                 Tables\Actions\DeleteAction::make()->label('حذف'),
             ])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])])
-            ->defaultSort('course_id')->reorderable('sort_order');
+            ->defaultSort('sort_order')
+            ->reorderable('sort_order')
+            ->paginated([25, 50, 100])
+            ->defaultPaginationPageOption(50);
     }
 
     public static function getPages(): array
