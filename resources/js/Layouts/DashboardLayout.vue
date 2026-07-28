@@ -98,6 +98,7 @@ const page = usePage();
 const navItems = [
   { route: 'dashboard.index',      label: 'داشبورد',       icon: '🏠' },
   { route: 'dashboard.my-courses', label: 'دوره‌های من',   icon: '📚' },
+  { route: 'dashboard.expenses',     label: 'ثبت هزینه‌ها',  icon: '💰' },
   { route: 'dashboard.orders',     label: 'سفارشات',       icon: '🧾' },
   { route: 'dashboard.profile',    label: 'پروفایل',       icon: '👤' },
 ];

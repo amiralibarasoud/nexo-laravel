@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\OtpAuthController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CouponController;
+use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Course\CourseController;
 use App\Http\Controllers\HomeController;
@@ -46,6 +47,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/orders', [UserDashboardController::class, 'orders'])->name('orders');
         Route::get('/profile', [UserDashboardController::class, 'profile'])->name('profile');
         Route::post('/profile', [UserDashboardController::class, 'updateProfile'])->name('profile.update');
+
+        Route::get('/expenses', [ExpenseController::class, 'index'])->name('expenses');
+        Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
+        Route::delete('/expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
     });
 });
 

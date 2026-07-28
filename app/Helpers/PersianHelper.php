@@ -72,6 +72,20 @@ if (!function_exists('toJalaliAgo')) {
     }
 }
 
+if (!function_exists('jalaliToGregorian')) {
+    function jalaliToGregorian(string $jalaliDate): ?\Carbon\Carbon
+    {
+        try {
+            $normalized = persianToEnglishNumber(trim($jalaliDate));
+            $normalized = str_replace(['-', '.'], '/', $normalized);
+
+            return \Morilog\Jalali\Jalalian::fromFormat('Y/m/d', $normalized)->toCarbon()->startOfDay();
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+}
+
 if (!function_exists('normalizeMobile')) {
     function normalizeMobile(string $mobile): string
     {
