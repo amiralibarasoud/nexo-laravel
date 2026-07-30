@@ -31,7 +31,7 @@ return new class extends Migration
             $table->boolean('has_audio')->default(false);
 
             // Stats
-            $table->unsignedInteger('students_count')->default(0);
+            $table->unsignedInteger('students_count')->default(40);
             $table->unsignedInteger('duration_minutes')->default(0); // total audio minutes
             $table->unsignedInteger('lessons_count')->default(0);
             $table->decimal('rating', 3, 2)->default(0);

@@ -33,7 +33,7 @@ class MoneyManagementCourseSeeder extends Seeder
             'published_at'     => now(),
             'lessons_count'    => 0,
             'duration_minutes' => 480,
-            'students_count'   => 0,
+            'students_count'   => \App\Models\Course::BASE_STUDENTS_COUNT,
         ]);
 
         $chapters = $this->getChapters();

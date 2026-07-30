@@ -42,7 +42,7 @@ class Enrollment extends Model
 
         static::deleted(function (Enrollment $enrollment) {
             Course::where('id', $enrollment->course_id)
-                ->where('students_count', '>', 0)
+                ->where('students_count', '>', Course::BASE_STUDENTS_COUNT)
                 ->decrement('students_count');
         });
     }

@@ -11,6 +11,13 @@ class Course extends Model
 {
     use SoftDeletes;
 
+    /** Display baseline: every course starts at this many students, then +1 per enrollment. */
+    public const BASE_STUDENTS_COUNT = 40;
+
+    protected $attributes = [
+        'students_count' => 40,
+    ];
+
     protected $fillable = [
         'category_id',
         'title',
@@ -252,21 +259,22 @@ class Course extends Model
     public function syncCounters(): void
     {
         $this->updateQuietly([
-            'students_count' => $this->enrollments()->count(),
+            'students_count' => self::BASE_STUDENTS_COUNT + $this->enrollments()->count(),
             'lessons_count'  => $this->lessons()->count(),
         ]);
     }
 
     /**
      * Prefer eager-loaded enrollments_count when available.
+     * Public count = baseline (40) + real enrollments.
      */
     public function resolveStudentsCount(): int
     {
-        if (array_key_exists('enrollments_count', $this->attributes)) {
-            return (int) $this->attributes['enrollments_count'];
-        }
+        $enrolled = array_key_exists('enrollments_count', $this->attributes)
+            ? (int) $this->attributes['enrollments_count']
+            : $this->enrollments()->count();
 
-        return (int) ($this->attributes['students_count'] ?? 0);
+        return self::BASE_STUDENTS_COUNT + $enrolled;
     }
 
     /**

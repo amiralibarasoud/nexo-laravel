@@ -55,10 +55,11 @@ class CourseController extends Controller
         ]);
 
         // Always keep denormalized lessons_count equal to real lesson rows.
+        // students_count = baseline (40) + real enrollments.
         $realLessonsCount = $course->lessons->count();
         $course->updateQuietly([
             'lessons_count' => $realLessonsCount,
-            'students_count' => $course->enrollments()->count(),
+            'students_count' => Course::BASE_STUDENTS_COUNT + $course->enrollments()->count(),
         ]);
 
         $course->loadCount(['enrollments', 'lessons']);
