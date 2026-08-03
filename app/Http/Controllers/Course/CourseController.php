@@ -241,10 +241,10 @@ class CourseController extends Controller
         if ($request->type === 'text' && $enrollment->canAccessText() && $lesson->text_content) {
             $content = ['type' => 'text', 'content' => $lesson->text_content];
         } elseif ($request->type === 'audio' && $enrollment->canAccessAudio() && $lesson->audio_path) {
-            // Generate a signed temporary URL to prevent direct download
             $content = [
                 'type' => 'audio',
-                'stream_url' => route('lessons.audio.stream', ['course' => $course->id, 'lesson' => $lesson->id]),
+                'stream_url' => route('lessons.audio.stream', ['course' => $course->id, 'lessonId' => $lesson->id]),
+                'mime_type' => $lesson->audioMimeType(),
             ];
         } else {
             return response()->json(['error' => 'Content not available'], 403);
@@ -267,13 +267,9 @@ class CourseController extends Controller
 
         $lesson = $course->lessons()->findOrFail($lessonId);
 
-        if (!$lesson->audio_path) {
-            abort(404);
-        }
+        $path = $lesson->resolveAudioAbsolutePath();
 
-        $path = storage_path('app/private/' . $lesson->audio_path);
-
-        if (!file_exists($path)) {
+        if (!$path) {
             abort(404);
         }
 
@@ -281,18 +277,21 @@ class CourseController extends Controller
         $start = 0;
         $end = $size - 1;
         $status = 200;
+        $mime = $lesson->audioMimeType($path);
         $headers = [
-            'Content-Type' => 'audio/mpeg',
+            'Content-Type' => $mime,
             'Accept-Ranges' => 'bytes',
-            'Content-Disposition' => 'inline',
-            'Cache-Control' => 'no-store, no-cache',
+            'Content-Disposition' => 'inline; filename="lesson-'.$lesson->id.'.'.pathinfo($path, PATHINFO_EXTENSION).'"',
+            'Cache-Control' => 'private, no-store, no-cache',
             'X-Content-Type-Options' => 'nosniff',
         ];
 
         if (request()->hasHeader('Range')) {
             preg_match('/bytes=(\d+)-(\d*)/', request()->header('Range'), $matches);
-            $start = (int) $matches[1];
+            $start = (int) ($matches[1] ?? 0);
             $end = isset($matches[2]) && $matches[2] !== '' ? (int) $matches[2] : $size - 1;
+            $start = max(0, min($start, $size - 1));
+            $end = max($start, min($end, $size - 1));
             $status = 206;
             $headers['Content-Range'] = "bytes {$start}-{$end}/{$size}";
         }

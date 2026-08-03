@@ -103,15 +103,18 @@
             <!-- Custom Audio Player with no download -->
             <audio
               ref="audioEl"
-              :src="audioStreamUrl"
               class="w-full"
               controlsList="nodownload nofullscreen noremoteplayback"
               controls
               preload="metadata"
               @timeupdate="onTimeUpdate"
               @ended="onAudioEnded"
-            ></audio>
-            <p class="text-xs text-gray-500 mt-2 text-center">🔒 دانلود فایل صوتی امکان‌پذیر نیست</p>
+              @error="onAudioError"
+            >
+              <source v-if="audioStreamUrl" :src="audioStreamUrl" :type="audioMimeType || undefined" />
+            </audio>
+            <p v-if="audioError" class="text-xs text-red-400 mt-2 text-center">{{ audioError }}</p>
+            <p v-else class="text-xs text-gray-500 mt-2 text-center">🔒 دانلود فایل صوتی امکان‌پذیر نیست</p>
           </div>
 
           <!-- Text Content -->
@@ -173,6 +176,8 @@ const activeLesson = ref(null);
 const activeType = ref(props.enrollment.can_access_text ? 'text' : 'audio');
 const textContent = ref('');
 const audioStreamUrl = ref('');
+const audioMimeType = ref('');
+const audioError = ref('');
 const contentLoading = ref(false);
 const completedLessons = ref({});
 const audioEl = ref(null);
@@ -194,6 +199,8 @@ async function selectLesson(lesson) {
   activeLesson.value = lesson;
   textContent.value = '';
   audioStreamUrl.value = '';
+  audioMimeType.value = '';
+  audioError.value = '';
   contentLoading.value = true;
 
   try {
@@ -203,17 +210,36 @@ async function selectLesson(lesson) {
       });
       textContent.value = res.data.content;
     } else if (activeType.value === 'audio' && lesson.has_audio) {
-      audioStreamUrl.value = route('lessons.audio.stream', { course: props.course.id, lessonId: lesson.id });
+      const res = await axios.get(route('lessons.content', { course: props.course.id, lessonId: lesson.id }), {
+        params: { type: 'audio' }
+      });
+      audioStreamUrl.value = res.data.stream_url
+        || route('lessons.audio.stream', { course: props.course.id, lessonId: lesson.id });
+      audioMimeType.value = res.data.mime_type || '';
       await nextTick();
-      if (audioEl.value && lesson.audio_position > 0) {
-        audioEl.value.currentTime = lesson.audio_position;
+      if (audioEl.value) {
+        audioEl.value.load();
+        if (lesson.audio_position > 0) {
+          const resume = () => {
+            try { audioEl.value.currentTime = lesson.audio_position; } catch (_) {}
+            audioEl.value.removeEventListener('loadedmetadata', resume);
+          };
+          audioEl.value.addEventListener('loadedmetadata', resume);
+        }
       }
     }
   } catch (e) {
     console.error(e);
+    if (activeType.value === 'audio') {
+      audioError.value = 'بارگذاری فایل صوتی انجام نشد. دوباره تلاش کنید.';
+    }
   } finally {
     contentLoading.value = false;
   }
+}
+
+function onAudioError() {
+  audioError.value = 'پخش این فایل در مرورگر ممکن نیست. فرمت‌هایی مثل MP3، M4A، AAC، WAV، OGG و FLAC معمولاً بهتر کار می‌کنند.';
 }
 
 async function markCompleted() {

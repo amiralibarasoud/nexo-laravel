@@ -59,14 +59,62 @@ class LessonResource extends Resource
 
                 Forms\Components\Tabs\Tab::make('فایل صوتی')->schema([
                     Forms\Components\FileUpload::make('audio_path')
-                        ->label('فایل صوتی MP3')
+                        ->label('فایل صوتی')
                         ->disk('local')
-                        ->directory('private/lessons/audio')
+                        ->directory('lessons/audio')
                         ->visibility('private')
-                        ->acceptedFileTypes(['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/m4a'])
-                        ->maxSize(102400)
-                        ->helperText('حداکثر ۱۰۰ مگابایت — فرمت MP3/WAV/M4A')
-                        ->downloadable(false),
+                        ->acceptedFileTypes([
+                            'audio/*',
+                            'audio/mpeg',
+                            'audio/mp3',
+                            'audio/mp4',
+                            'audio/x-m4a',
+                            'audio/m4a',
+                            'audio/aac',
+                            'audio/wav',
+                            'audio/x-wav',
+                            'audio/wave',
+                            'audio/ogg',
+                            'audio/opus',
+                            'audio/webm',
+                            'audio/flac',
+                            'audio/x-flac',
+                            'audio/x-ms-wma',
+                            'audio/wma',
+                            'audio/aiff',
+                            'audio/x-aiff',
+                            'audio/amr',
+                            'audio/3gpp',
+                            'video/mp4',
+                            'application/ogg',
+                            'application/octet-stream',
+                        ])
+                        ->rules([
+                            'nullable',
+                            'file',
+                            'max:5242880',
+                            function (string $attribute, $value, \Closure $fail) {
+                                if (! $value instanceof \Illuminate\Http\UploadedFile) {
+                                    return;
+                                }
+
+                                $ext = strtolower($value->getClientOriginalExtension() ?: $value->guessExtension() ?: '');
+                                $allowed = [
+                                    'mp3', 'mpga', 'mp2', 'wav', 'wave', 'ogg', 'oga', 'opus',
+                                    'm4a', 'aac', 'flac', 'wma', 'webm', 'weba', 'aif', 'aiff',
+                                    'amr', '3gp', '3gpp', 'mp4',
+                                ];
+
+                                if ($ext === '' || ! in_array($ext, $allowed, true)) {
+                                    $fail('فرمت فایل صوتی پشتیبانی نمی‌شود.');
+                                }
+                            },
+                        ])
+                        ->maxSize(5242880)
+                        ->helperText('هر فرمت صوتی (MP3، M4A، AAC، WAV، OGG، FLAC، Opus، WebM و …) — بدون محدودیت عملی حجم. برای فایل‌های خیلی بزرگ صبور باشید.')
+                        ->downloadable(false)
+                        ->openable(false)
+                        ->previewable(false),
 
                     Forms\Components\TextInput::make('audio_duration_seconds')
                         ->label('مدت زمان (ثانیه)')->numeric()->nullable()
