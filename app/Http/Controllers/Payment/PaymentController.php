@@ -48,7 +48,7 @@ class PaymentController extends Controller
                 'id' => $course->id,
                 'title' => $course->title,
                 'slug' => $course->slug,
-                'cover_image' => $course->cover_image,
+                'cover_image' => $course->cover_image_url,
                 'price' => $course->starting_price,
                 'discounted_price' => $course->discounted_price,
                 'effective_price' => $course->starting_effective_price,

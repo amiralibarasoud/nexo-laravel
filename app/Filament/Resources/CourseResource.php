@@ -46,15 +46,49 @@ class CourseResource extends Resource
 
                 Forms\Components\Tabs\Tab::make('تصاویر و مدرس')->schema([
                     Forms\Components\FileUpload::make('cover_image')
-                        ->label('تصویر کاور')->image()
-                        ->disk('public')->directory('courses/covers')
-                        ->imageResizeMode('cover')->imageCropAspectRatio('16:9')
-                        ->maxSize(5120)->helperText('حداکثر ۵ مگابایت — نسبت ۱۶:۹'),
+                        ->label('تصویر کاور')
+                        ->image()
+                        ->disk('public')
+                        ->directory('courses/covers')
+                        ->visibility('public')
+                        ->acceptedFileTypes([
+                            'image/jpeg',
+                            'image/jpg',
+                            'image/pjpeg',
+                            'image/png',
+                            'image/webp',
+                            'image/gif',
+                            'image/bmp',
+                            'image/x-ms-bmp',
+                            'image/avif',
+                            'image/svg+xml',
+                        ])
+                        ->maxSize(10240)
+                        ->imagePreviewHeight('220')
+                        ->helperText('هر ابعاد و نسبت تصویری قابل قبول است. فرمت‌های JPG، PNG، WebP، GIF، BMP، AVIF و SVG — حداکثر ۱۰ مگابایت'),
                     Forms\Components\Grid::make(2)->schema([
                         Forms\Components\TextInput::make('instructor_name')->label('نام مدرس'),
                         Forms\Components\FileUpload::make('instructor_avatar')
-                            ->label('تصویر مدرس')->image()
-                            ->disk('public')->directory('instructors')->maxSize(2048),
+                            ->label('تصویر مدرس')
+                            ->image()
+                            ->disk('public')
+                            ->directory('instructors')
+                            ->visibility('public')
+                            ->acceptedFileTypes([
+                                'image/jpeg',
+                                'image/jpg',
+                                'image/pjpeg',
+                                'image/png',
+                                'image/webp',
+                                'image/gif',
+                                'image/bmp',
+                                'image/x-ms-bmp',
+                                'image/avif',
+                                'image/svg+xml',
+                            ])
+                            ->maxSize(5120)
+                            ->imagePreviewHeight('160')
+                            ->helperText('هر ابعاد و فرمت تصویری — حداکثر ۵ مگابایت'),
                     ]),
                     Forms\Components\Textarea::make('instructor_bio')->label('بیوگرافی مدرس')->rows(3),
                 ]),

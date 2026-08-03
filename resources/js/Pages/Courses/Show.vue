@@ -47,9 +47,11 @@
           <div class="rounded-2xl overflow-hidden aspect-video bg-gray-100 shadow-lg">
             <img
               v-if="course.cover_image"
-              :src="`/storage/${course.cover_image}`"
+              :src="mediaUrl(course.cover_image)"
               :alt="course.title"
               class="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
             />
             <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-100 to-primary-200">
               <svg class="w-24 h-24 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -69,7 +71,7 @@
             <h2 class="text-xl font-bold text-gray-900 mb-4">مدرس دوره</h2>
             <div class="flex items-start gap-4">
               <div class="w-16 h-16 rounded-2xl overflow-hidden bg-gray-100 flex-shrink-0">
-                <img v-if="course.instructor_avatar" :src="`/storage/${course.instructor_avatar}`" :alt="course.instructor_name" class="w-full h-full object-cover" />
+                <img v-if="course.instructor_avatar" :src="mediaUrl(course.instructor_avatar)" :alt="course.instructor_name" class="w-full h-full object-cover" loading="lazy" decoding="async" />
                 <div v-else class="w-full h-full flex items-center justify-center">
                   <svg class="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
@@ -211,6 +213,7 @@
 import MainLayout from '@/Layouts/MainLayout.vue';
 import { Link, Head } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import { mediaUrl } from '@/utils/media';
 
 const props = defineProps({
   course: Object,
@@ -220,7 +223,7 @@ const props = defineProps({
 
 const seoTitle = computed(() => props.course.title);
 const seoDesc = computed(() => props.course.short_description || `دوره ${props.course.title} - خرید و مشاهده دوره`);
-const seoImage = computed(() => props.course.cover_image ? `/storage/${props.course.cover_image}` : null);
+const seoImage = computed(() => mediaUrl(props.course.cover_image));
 
 const lessonsCount = computed(() => {
   const fromSections = (props.course.sections ?? []).reduce(

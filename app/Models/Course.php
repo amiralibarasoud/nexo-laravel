@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -241,6 +242,16 @@ class Course extends Model
             'advanced' => 'پیشرفته',
             default => 'همه سطوح',
         };
+    }
+
+    protected function coverImageUrl(): Attribute
+    {
+        return Attribute::get(fn (): ?string => publicStorageUrl($this->cover_image));
+    }
+
+    protected function instructorAvatarUrl(): Attribute
+    {
+        return Attribute::get(fn (): ?string => publicStorageUrl($this->instructor_avatar));
     }
 
     public function scopePublished($query)

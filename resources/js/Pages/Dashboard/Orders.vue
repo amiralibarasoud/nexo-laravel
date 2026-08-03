@@ -9,7 +9,7 @@
           <div class="flex items-center gap-4">
             <!-- Course Cover -->
             <div class="w-20 h-20 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
-              <img v-if="order.course_cover" :src="`/storage/${order.course_cover}`" class="w-full h-full object-cover"/>
+              <img v-if="order.course_cover" :src="mediaUrl(order.course_cover)" class="w-full h-full object-cover" loading="lazy" decoding="async"/>
               <div v-else class="w-full h-full bg-primary-100 flex items-center justify-center">
                 <span class="text-2xl">📚</span>
               </div>
@@ -63,6 +63,7 @@
 <script setup>
 import DashboardLayout from '@/Layouts/DashboardLayout.vue';
 import { Link } from '@inertiajs/vue3';
+import { mediaUrl } from '@/utils/media';
 
 defineProps({ orders: Array });
 

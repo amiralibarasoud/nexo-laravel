@@ -1,0 +1,1 @@
+function s(e){if(!e)return null;const t=String(e).trim().replace(/\\/g,"/");if(!t)return null;if(/^(https?:)?\/\//i.test(t)||t.startsWith("data:")||t.startsWith("blob:")||t.startsWith("/storage/")||t.startsWith("/uploads/"))return t;let r=t.replace(/^\/+/,"");return r.startsWith("storage/")&&(r=r.slice(8)),r.startsWith("public/")&&(r=r.slice(7)),`/storage/${r}`}export{s as m};

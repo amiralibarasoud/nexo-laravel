@@ -137,3 +137,38 @@ if (!function_exists('formatDuration')) {
         return toFarsiNumber($hours) . ' ساعت و ' . toFarsiNumber($mins) . ' دقیقه';
     }
 }
+
+if (!function_exists('publicStorageUrl')) {
+    /**
+     * Build a browser-ready URL for a file on the public disk.
+     * Accepts relative paths, /storage/... paths, or absolute URLs.
+     */
+    function publicStorageUrl(?string $path): ?string
+    {
+        if ($path === null) {
+            return null;
+        }
+
+        $path = trim(str_replace('\\', '/', $path));
+
+        if ($path === '') {
+            return null;
+        }
+
+        if (preg_match('#^(https?:)?//#i', $path) || str_starts_with($path, 'data:')) {
+            return $path;
+        }
+
+        $path = ltrim($path, '/');
+
+        if (str_starts_with($path, 'storage/')) {
+            $path = substr($path, strlen('storage/'));
+        }
+
+        if (str_starts_with($path, 'public/')) {
+            $path = substr($path, strlen('public/'));
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('public')->url($path);
+    }
+}

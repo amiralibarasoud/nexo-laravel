@@ -4,9 +4,11 @@
     <div class="relative aspect-video overflow-hidden bg-gray-100">
       <img
         v-if="course.cover_image"
-        :src="`/storage/${course.cover_image}`"
+        :src="mediaUrl(course.cover_image)"
         :alt="course.title"
         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        loading="lazy"
+        decoding="async"
       />
       <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-100 to-primary-200">
         <svg class="w-16 h-16 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,6 +102,7 @@
 
 <script setup>
 import { Link } from '@inertiajs/vue3';
+import { mediaUrl } from '@/utils/media';
 
 defineProps({
   course: {

@@ -23,7 +23,7 @@ class HomeController extends Controller
                 'title' => $c->title,
                 'slug' => $c->slug,
                 'short_description' => $c->short_description,
-                'cover_image' => $c->cover_image,
+                'cover_image' => $c->cover_image_url,
                 'instructor_name' => $c->instructor_name,
                 'price' => $c->starting_price,
                 'discounted_price' => $c->discounted_price,

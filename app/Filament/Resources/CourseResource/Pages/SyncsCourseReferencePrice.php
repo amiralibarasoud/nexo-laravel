@@ -91,16 +91,35 @@ trait SyncsCourseReferencePrice
             return null;
         }
 
-        if (is_string($value)) {
-            return $value;
-        }
-
         if (is_array($value)) {
-            $path = Arr::first(Arr::flatten($value));
-
-            return is_string($path) ? $path : null;
+            $value = Arr::first(Arr::flatten($value));
         }
 
-        return null;
+        if (! is_string($value) || blank($value)) {
+            return null;
+        }
+
+        $path = str_replace('\\', '/', trim($value));
+
+        if (preg_match('#^https?://#i', $path) || str_starts_with($path, '//')) {
+            $storagePos = stripos($path, '/storage/');
+            if ($storagePos !== false) {
+                $path = substr($path, $storagePos + strlen('/storage/'));
+            } else {
+                $path = ltrim((string) parse_url($path, PHP_URL_PATH), '/');
+            }
+        }
+
+        $path = ltrim($path, '/');
+
+        if (str_starts_with($path, 'storage/')) {
+            $path = substr($path, strlen('storage/'));
+        }
+
+        if (str_starts_with($path, 'public/')) {
+            $path = substr($path, strlen('public/'));
+        }
+
+        return $path !== '' ? $path : null;
     }
 }

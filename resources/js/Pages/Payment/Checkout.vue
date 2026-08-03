@@ -10,7 +10,7 @@
           <!-- Course Info -->
           <div class="flex items-center gap-4 pb-5 border-b border-gray-100">
             <div class="w-20 h-20 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
-              <img v-if="course.cover_image" :src="`/storage/${course.cover_image}`" :alt="course.title" class="w-full h-full object-cover" />
+              <img v-if="course.cover_image" :src="mediaUrl(course.cover_image)" :alt="course.title" class="w-full h-full object-cover" loading="lazy" decoding="async" />
               <div v-else class="w-full h-full bg-primary-100 flex items-center justify-center text-2xl">📚</div>
             </div>
             <div>
@@ -191,6 +191,7 @@
 import { reactive, ref, computed, watch } from 'vue';
 import axios from 'axios';
 import MainLayout from '@/Layouts/MainLayout.vue';
+import { mediaUrl } from '@/utils/media';
 
 const props = defineProps({
   course: Object,

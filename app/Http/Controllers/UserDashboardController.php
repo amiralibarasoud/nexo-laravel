@@ -67,7 +67,7 @@ class UserDashboardController extends Controller
                 'order_number' => $o->order_number,
                 'course_title' => $o->course->title,
                 'course_slug' => $o->course->slug,
-                'course_cover' => $o->course->cover_image,
+                'course_cover' => $o->course->cover_image_url,
                 'amount' => $o->amount,
                 'content_type' => match($o->content_type) {
                     'text' => 'متنی',
@@ -137,7 +137,7 @@ class UserDashboardController extends Controller
             'course_id' => $course?->id,
             'title' => $course?->title,
             'slug' => $course?->slug,
-            'cover_image' => $course?->cover_image,
+            'cover_image' => $course?->cover_image_url,
             'instructor_name' => $course?->instructor_name,
             'lessons_count' => $course?->lessons_count ?? 0,
             'content_type' => $e->content_type,
