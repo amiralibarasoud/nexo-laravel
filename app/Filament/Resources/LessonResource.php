@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\LessonResource\Pages;
 use App\Models\Course;
 use App\Models\Lesson;
+use App\Rules\AudioFile;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -93,22 +94,7 @@ class LessonResource extends Resource
                             'nullable',
                             'file',
                             'max:5242880',
-                            function (string $attribute, $value, \Closure $fail) {
-                                if (! $value instanceof \Illuminate\Http\UploadedFile) {
-                                    return;
-                                }
-
-                                $ext = strtolower($value->getClientOriginalExtension() ?: $value->guessExtension() ?: '');
-                                $allowed = [
-                                    'mp3', 'mpga', 'mp2', 'wav', 'wave', 'ogg', 'oga', 'opus',
-                                    'm4a', 'aac', 'flac', 'wma', 'webm', 'weba', 'aif', 'aiff',
-                                    'amr', '3gp', '3gpp', 'mp4',
-                                ];
-
-                                if ($ext === '' || ! in_array($ext, $allowed, true)) {
-                                    $fail('فرمت فایل صوتی پشتیبانی نمی‌شود.');
-                                }
-                            },
+                            new AudioFile(),
                         ])
                         ->maxSize(5242880)
                         ->helperText('هر فرمت صوتی (MP3، M4A، AAC، WAV، OGG، FLAC، Opus، WebM و …) — بدون محدودیت عملی حجم. برای فایل‌های خیلی بزرگ صبور باشید.')
