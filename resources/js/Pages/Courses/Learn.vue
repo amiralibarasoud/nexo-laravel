@@ -1,17 +1,30 @@
 <template>
   <div class="min-h-screen bg-gray-900 text-white" dir="rtl">
     <!-- Top Bar -->
-    <header class="bg-gray-800 border-b border-gray-700 h-14 flex items-center px-4 gap-3">
-      <Link :href="route('courses.show', course.slug)" class="text-gray-400 hover:text-white transition-colors flex-shrink-0">
+    <header class="bg-gray-800 border-b border-gray-700 h-14 flex items-center px-3 sm:px-4 gap-2 sm:gap-3 relative z-30">
+      <Link :href="route('courses.show', course.slug)" class="text-gray-400 hover:text-white transition-colors flex-shrink-0 p-1">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
         </svg>
       </Link>
+
+      <!-- Mobile hamburger -->
+      <button
+        type="button"
+        class="md:hidden flex-shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary-600 text-white hover:bg-primary-700 transition-all"
+        @click="openSyllabus"
+        aria-label="باز کردن سرفصل‌ها"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h10"/>
+        </svg>
+      </button>
+
       <h1 class="font-bold text-sm flex-1 truncate min-w-0">{{ course.title }}</h1>
 
-      <!-- Content Type Toggle -->
       <div v-if="enrollment.can_access_text && enrollment.can_access_audio" class="flex bg-gray-700 rounded-lg p-1 gap-1 flex-shrink-0">
         <button
+          type="button"
           @click="activeType = 'text'"
           class="px-2.5 sm:px-3 py-1 rounded-md text-xs font-medium transition-all"
           :class="activeType === 'text' ? 'bg-white text-gray-900' : 'text-gray-400 hover:text-white'"
@@ -19,6 +32,7 @@
           متن
         </button>
         <button
+          type="button"
           @click="activeType = 'audio'"
           class="px-2.5 sm:px-3 py-1 rounded-md text-xs font-medium transition-all"
           :class="activeType === 'audio' ? 'bg-white text-gray-900' : 'text-gray-400 hover:text-white'"
@@ -26,60 +40,22 @@
           صوت
         </button>
       </div>
-
-      <!-- Mobile curriculum toggle -->
-      <button
-        type="button"
-        class="md:hidden flex-shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gray-700 text-gray-200 hover:bg-gray-600 hover:text-white text-xs font-medium transition-all"
-        @click="sidebarOpen = true"
-        aria-label="سرفصل دوره"
-      >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h10"/>
-        </svg>
-        سرفصل
-      </button>
     </header>
 
-    <div class="flex h-[calc(100vh-3.5rem)] relative">
-      <!-- Mobile overlay -->
-      <div
-        v-if="sidebarOpen"
-        class="fixed inset-0 z-40 bg-black/60 md:hidden"
-        @click="sidebarOpen = false"
-      />
-
-      <!-- Sidebar: Curriculum -->
-      <aside
-        class="w-80 max-w-[85vw] bg-gray-800 border-l border-gray-700 overflow-y-auto flex-shrink-0
-               fixed md:static inset-y-0 right-0 z-50 md:z-auto
-               transform transition-transform duration-200 ease-out
-               md:translate-x-0 md:block
-               top-14 md:top-auto h-[calc(100vh-3.5rem)] md:h-auto"
-        :class="sidebarOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'"
-      >
+    <div class="flex h-[calc(100vh-3.5rem)]">
+      <!-- Desktop sidebar -->
+      <aside class="hidden md:block w-80 bg-gray-800 border-l border-gray-700 overflow-y-auto flex-shrink-0">
         <div class="p-4">
-          <div class="flex items-center justify-between mb-3 md:block">
-            <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wide">سرفصل دوره</h3>
-            <button
-              type="button"
-              class="md:hidden p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 transition-all"
-              @click="sidebarOpen = false"
-              aria-label="بستن سرفصل"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-              </svg>
-            </button>
-          </div>
+          <h3 class="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wide">سرفصل دوره</h3>
           <div class="space-y-3">
-            <div v-for="section in course.sections" :key="section.id">
+            <div v-for="section in course.sections" :key="'desk-' + section.id">
               <div class="text-xs text-gray-400 font-semibold uppercase tracking-wide mb-1.5 px-2">{{ section.title }}</div>
               <ul class="space-y-0.5">
-                <li v-for="lesson in section.lessons" :key="lesson.id">
+                <li v-for="lesson in section.lessons" :key="'desk-l-' + lesson.id">
                   <button
+                    type="button"
                     @click="selectLesson(lesson)"
-                    class="w-full text-right px-3 py-2.5 rounded-lg text-sm transition-all flex items-center justify-between gap-2 group"
+                    class="w-full text-right px-3 py-2.5 rounded-lg text-sm transition-all flex items-center justify-between gap-2"
                     :class="activeLesson?.id === lesson.id
                       ? 'bg-primary-600 text-white'
                       : 'text-gray-400 hover:bg-gray-700 hover:text-white'"
@@ -97,34 +73,46 @@
         </div>
       </aside>
 
-      <!-- Main Content Area -->
-      <main class="flex-1 overflow-y-auto min-w-0">
+      <!-- Main -->
+      <main class="flex-1 overflow-y-auto min-w-0 w-full">
         <div v-if="!activeLesson" class="flex items-center justify-center h-full text-center px-6">
           <div>
             <div class="text-6xl mb-4">📚</div>
             <h2 class="text-xl font-bold mb-2">یک جلسه انتخاب کنید</h2>
-            <p class="text-gray-400 text-sm md:hidden">با دکمه «سرفصل» در بالا، جلسه‌ای را برای شروع انتخاب کنید.</p>
+            <p class="text-gray-400 text-sm md:hidden mb-5">با دکمه منو بالا، سرفصل را باز کنید و جلسه را انتخاب کنید.</p>
             <p class="text-gray-400 text-sm hidden md:block">از فهرست سمت راست، جلسه‌ای را برای شروع انتخاب کنید.</p>
             <button
               type="button"
-              class="md:hidden mt-5 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-sm font-medium transition-all"
-              @click="sidebarOpen = true"
+              class="md:hidden inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-sm font-medium transition-all"
+              @click="openSyllabus"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h10"/>
               </svg>
-              مشاهده سرفصل
+              باز کردن سرفصل‌ها
             </button>
           </div>
         </div>
 
-        <div v-else class="max-w-4xl mx-auto p-6 space-y-6">
-          <!-- Lesson Title -->
-          <div class="flex items-center justify-between">
-            <h2 class="text-xl font-bold">{{ activeLesson.title }}</h2>
+        <div v-else class="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0 flex-1">
+              <button
+                type="button"
+                class="md:hidden mb-3 inline-flex items-center gap-1.5 text-xs text-primary-300 hover:text-white transition-colors"
+                @click="openSyllabus"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h10"/>
+                </svg>
+                تغییر سرفصل
+              </button>
+              <h2 class="text-lg sm:text-xl font-bold leading-snug">{{ activeLesson.title }}</h2>
+            </div>
             <button
+              type="button"
               @click="markCompleted"
-              class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all"
+              class="flex-shrink-0 flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all"
               :class="isCompleted(activeLesson)
                 ? 'bg-green-600/20 text-green-400 border border-green-600/30'
                 : 'bg-gray-700 text-gray-300 hover:bg-gray-600'"
@@ -136,21 +124,18 @@
             </button>
           </div>
 
-          <!-- Audio Player -->
-          <div v-if="activeType === 'audio' && activeLesson.has_audio" class="bg-gray-800 rounded-2xl p-6">
+          <div v-if="activeType === 'audio' && activeLesson.has_audio" class="bg-gray-800 rounded-2xl p-4 sm:p-6">
             <div class="flex items-center gap-3 mb-4">
-              <div class="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center">
+              <div class="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center flex-shrink-0">
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd"/>
                 </svg>
               </div>
-              <div>
-                <p class="font-semibold">{{ activeLesson.title }}</p>
+              <div class="min-w-0">
+                <p class="font-semibold truncate">{{ activeLesson.title }}</p>
                 <p class="text-gray-400 text-sm">{{ activeLesson.duration }}</p>
               </div>
             </div>
-
-            <!-- Custom Audio Player with no download -->
             <audio
               ref="audioEl"
               class="w-full"
@@ -167,12 +152,10 @@
             <p v-else class="text-xs text-gray-500 mt-2 text-center">🔒 دانلود فایل صوتی امکان‌پذیر نیست</p>
           </div>
 
-          <!-- Text Content -->
-          <div v-if="activeType === 'text' && activeLesson.has_text && textContent" class="bg-white text-gray-900 rounded-2xl p-8">
+          <div v-if="activeType === 'text' && activeLesson.has_text && textContent" class="bg-white text-gray-900 rounded-2xl p-5 sm:p-8">
             <div class="prose max-w-none leading-loose text-base" v-html="textContent"></div>
           </div>
 
-          <!-- Loading -->
           <div v-if="contentLoading" class="flex items-center justify-center py-16">
             <div class="text-center">
               <svg class="animate-spin w-8 h-8 text-primary-500 mx-auto mb-3" fill="none" viewBox="0 0 24 24">
@@ -183,12 +166,12 @@
             </div>
           </div>
 
-          <!-- Navigation -->
-          <div class="flex justify-between items-center pt-4 border-t border-gray-700">
+          <div class="flex justify-between items-center pt-4 border-t border-gray-700 gap-2">
             <button
+              type="button"
               @click="prevLesson"
               :disabled="!hasPrevLesson"
-              class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm bg-gray-700 hover:bg-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              class="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm bg-gray-700 hover:bg-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -196,9 +179,10 @@
               جلسه قبل
             </button>
             <button
+              type="button"
               @click="nextLesson"
               :disabled="!hasNextLesson"
-              class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm bg-primary-600 hover:bg-primary-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              class="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm bg-primary-600 hover:bg-primary-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
               جلسه بعد
               <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -209,11 +193,58 @@
         </div>
       </main>
     </div>
+
+    <!-- Mobile drawer -->
+    <Teleport to="body">
+      <div v-show="sidebarOpen" class="md:hidden fixed inset-0 z-[100]" dir="rtl">
+        <div class="absolute inset-0 bg-black/70" @click="closeSyllabus" />
+        <aside
+          class="absolute top-0 bottom-0 right-0 w-[min(20rem,88vw)] bg-gray-800 shadow-2xl flex flex-col text-white"
+          role="dialog"
+          aria-modal="true"
+          aria-label="سرفصل دوره"
+        >
+          <div class="h-14 flex items-center justify-between px-4 border-b border-gray-700 flex-shrink-0">
+            <h3 class="text-sm font-semibold">سرفصل دوره</h3>
+            <button type="button" class="p-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-700" @click="closeSyllabus" aria-label="بستن">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          <div class="flex-1 overflow-y-auto p-4 overscroll-contain">
+            <div class="space-y-3">
+              <div v-for="section in course.sections" :key="'mob-' + section.id">
+                <div class="text-xs text-gray-400 font-semibold uppercase tracking-wide mb-1.5 px-2">{{ section.title }}</div>
+                <ul class="space-y-0.5">
+                  <li v-for="lesson in section.lessons" :key="'mob-l-' + lesson.id">
+                    <button
+                      type="button"
+                      @click="selectLesson(lesson)"
+                      class="w-full text-right px-3 py-2.5 rounded-lg text-sm transition-all flex items-center justify-between gap-2"
+                      :class="activeLesson?.id === lesson.id
+                        ? 'bg-primary-600 text-white'
+                        : 'text-gray-300 hover:bg-gray-700 hover:text-white'"
+                    >
+                      <span class="truncate flex-1">{{ lesson.title }}</span>
+                      <div class="flex items-center gap-1 flex-shrink-0">
+                        <span v-if="isCompleted(lesson)" class="text-green-400 text-xs">✓</span>
+                        <span v-if="lesson.has_audio && (activeType === 'audio' || !enrollment.can_access_text)" class="text-gray-500 text-xs">{{ lesson.duration }}</span>
+                      </div>
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue';
+import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import axios from 'axios';
 
@@ -234,10 +265,23 @@ const audioEl = ref(null);
 const sidebarOpen = ref(false);
 let saveProgressTimer = null;
 
-// Flatten all lessons
 const allLessons = computed(() =>
   props.course.sections.flatMap(s => s.lessons)
 );
+
+function openSyllabus() {
+  sidebarOpen.value = true;
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSyllabus() {
+  sidebarOpen.value = false;
+  document.body.style.overflow = '';
+}
+
+onBeforeUnmount(() => {
+  document.body.style.overflow = '';
+});
 
 function isCompleted(lesson) {
   const key = `${lesson.id}_${activeType.value}`;
@@ -248,7 +292,7 @@ function isCompleted(lesson) {
 
 async function selectLesson(lesson) {
   activeLesson.value = lesson;
-  sidebarOpen.value = false;
+  closeSyllabus();
   textContent.value = '';
   audioStreamUrl.value = '';
   audioMimeType.value = '';
