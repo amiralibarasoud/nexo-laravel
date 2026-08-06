@@ -47,7 +47,7 @@ class HomeController extends Controller
 
         $stats = [
             'courses_count'  => Course::published()->count(),
-            'students_count' => \App\Models\Enrollment::count(),
+            'students_count' => Course::BASE_STUDENTS_COUNT + \App\Models\Enrollment::count(),
             'users_count'    => \App\Models\User::where('is_admin', false)->count(),
         ];
 

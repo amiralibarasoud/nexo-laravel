@@ -1,38 +1,77 @@
 <template>
   <div class="min-h-screen bg-gray-900 text-white" dir="rtl">
     <!-- Top Bar -->
-    <header class="bg-gray-800 border-b border-gray-700 h-14 flex items-center px-4 gap-4">
-      <Link :href="route('courses.show', course.slug)" class="text-gray-400 hover:text-white transition-colors">
+    <header class="bg-gray-800 border-b border-gray-700 h-14 flex items-center px-4 gap-3">
+      <Link :href="route('courses.show', course.slug)" class="text-gray-400 hover:text-white transition-colors flex-shrink-0">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
         </svg>
       </Link>
-      <h1 class="font-bold text-sm flex-1 truncate">{{ course.title }}</h1>
+      <h1 class="font-bold text-sm flex-1 truncate min-w-0">{{ course.title }}</h1>
 
       <!-- Content Type Toggle -->
-      <div v-if="enrollment.can_access_text && enrollment.can_access_audio" class="flex bg-gray-700 rounded-lg p-1 gap-1">
+      <div v-if="enrollment.can_access_text && enrollment.can_access_audio" class="flex bg-gray-700 rounded-lg p-1 gap-1 flex-shrink-0">
         <button
           @click="activeType = 'text'"
-          class="px-3 py-1 rounded-md text-xs font-medium transition-all"
+          class="px-2.5 sm:px-3 py-1 rounded-md text-xs font-medium transition-all"
           :class="activeType === 'text' ? 'bg-white text-gray-900' : 'text-gray-400 hover:text-white'"
         >
-          📄 متن
+          متن
         </button>
         <button
           @click="activeType = 'audio'"
-          class="px-3 py-1 rounded-md text-xs font-medium transition-all"
+          class="px-2.5 sm:px-3 py-1 rounded-md text-xs font-medium transition-all"
           :class="activeType === 'audio' ? 'bg-white text-gray-900' : 'text-gray-400 hover:text-white'"
         >
-          🎧 صوت
+          صوت
         </button>
       </div>
+
+      <!-- Mobile curriculum toggle -->
+      <button
+        type="button"
+        class="md:hidden flex-shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gray-700 text-gray-200 hover:bg-gray-600 hover:text-white text-xs font-medium transition-all"
+        @click="sidebarOpen = true"
+        aria-label="سرفصل دوره"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h10"/>
+        </svg>
+        سرفصل
+      </button>
     </header>
 
-    <div class="flex h-[calc(100vh-3.5rem)]">
+    <div class="flex h-[calc(100vh-3.5rem)] relative">
+      <!-- Mobile overlay -->
+      <div
+        v-if="sidebarOpen"
+        class="fixed inset-0 z-40 bg-black/60 md:hidden"
+        @click="sidebarOpen = false"
+      />
+
       <!-- Sidebar: Curriculum -->
-      <aside class="w-80 bg-gray-800 border-l border-gray-700 overflow-y-auto flex-shrink-0 hidden md:block">
+      <aside
+        class="w-80 max-w-[85vw] bg-gray-800 border-l border-gray-700 overflow-y-auto flex-shrink-0
+               fixed md:static inset-y-0 right-0 z-50 md:z-auto
+               transform transition-transform duration-200 ease-out
+               md:translate-x-0 md:block
+               top-14 md:top-auto h-[calc(100vh-3.5rem)] md:h-auto"
+        :class="sidebarOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'"
+      >
         <div class="p-4">
-          <h3 class="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wide">سرفصل دوره</h3>
+          <div class="flex items-center justify-between mb-3 md:block">
+            <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wide">سرفصل دوره</h3>
+            <button
+              type="button"
+              class="md:hidden p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 transition-all"
+              @click="sidebarOpen = false"
+              aria-label="بستن سرفصل"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
           <div class="space-y-3">
             <div v-for="section in course.sections" :key="section.id">
               <div class="text-xs text-gray-400 font-semibold uppercase tracking-wide mb-1.5 px-2">{{ section.title }}</div>
@@ -59,12 +98,23 @@
       </aside>
 
       <!-- Main Content Area -->
-      <main class="flex-1 overflow-y-auto">
+      <main class="flex-1 overflow-y-auto min-w-0">
         <div v-if="!activeLesson" class="flex items-center justify-center h-full text-center px-6">
           <div>
             <div class="text-6xl mb-4">📚</div>
             <h2 class="text-xl font-bold mb-2">یک جلسه انتخاب کنید</h2>
-            <p class="text-gray-400 text-sm">از فهرست سمت راست، جلسه‌ای را برای شروع انتخاب کنید.</p>
+            <p class="text-gray-400 text-sm md:hidden">با دکمه «سرفصل» در بالا، جلسه‌ای را برای شروع انتخاب کنید.</p>
+            <p class="text-gray-400 text-sm hidden md:block">از فهرست سمت راست، جلسه‌ای را برای شروع انتخاب کنید.</p>
+            <button
+              type="button"
+              class="md:hidden mt-5 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-sm font-medium transition-all"
+              @click="sidebarOpen = true"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h10"/>
+              </svg>
+              مشاهده سرفصل
+            </button>
           </div>
         </div>
 
@@ -181,6 +231,7 @@ const audioError = ref('');
 const contentLoading = ref(false);
 const completedLessons = ref({});
 const audioEl = ref(null);
+const sidebarOpen = ref(false);
 let saveProgressTimer = null;
 
 // Flatten all lessons
@@ -197,6 +248,7 @@ function isCompleted(lesson) {
 
 async function selectLesson(lesson) {
   activeLesson.value = lesson;
+  sidebarOpen.value = false;
   textContent.value = '';
   audioStreamUrl.value = '';
   audioMimeType.value = '';
